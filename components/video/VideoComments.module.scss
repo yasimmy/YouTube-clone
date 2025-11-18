@@ -1,0 +1,433 @@
+.comments {
+  margin-top: 24px;
+}
+
+.title {
+  font-size: 18px;
+  font-weight: 600;
+  color: var(--text-primary);
+  margin-bottom: 24px;
+}
+
+.addComment {
+  display: flex;
+  gap: 16px;
+  margin-bottom: 32px;
+}
+
+.avatar {
+  width: 40px;
+  height: 40px;
+  border-radius: 50%;
+  object-fit: cover;
+  flex-shrink: 0;
+}
+
+.avatarPlaceholder {
+  width: 40px;
+  height: 40px;
+  border-radius: 50%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background: linear-gradient(135deg, #667eea, #764ba2);
+  color: white;
+  font-weight: 600;
+  font-size: 16px;
+  flex-shrink: 0;
+}
+
+.commentInput {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+
+  input {
+    width: 100%;
+    padding: 8px 0;
+    border: none;
+    border-bottom: 1px solid var(--border-color);
+    background-color: transparent;
+    color: var(--text-primary);
+    font-size: 14px;
+    outline: none;
+    transition: border-color 0.2s;
+
+    &:focus {
+      border-bottom-color: var(--accent);
+    }
+
+    &::placeholder {
+      color: var(--text-tertiary);
+    }
+  }
+
+  button {
+    align-self: flex-end;
+    padding: 8px 24px;
+    border-radius: 18px;
+    background-color: var(--accent);
+    color: white;
+    font-size: 14px;
+    font-weight: 500;
+    transition: background-color 0.2s;
+
+    &:hover:not(:disabled) {
+      background-color: var(--accent-hover);
+    }
+
+    &:disabled {
+      opacity: 0.5;
+      cursor: not-allowed;
+    }
+  }
+}
+
+.commentsList {
+  display: flex;
+  flex-direction: column;
+  gap: 24px;
+}
+
+.comment {
+  .commentHeader {
+    display: flex;
+    gap: 16px;
+  }
+
+  .commentContent {
+    flex: 1;
+    min-width: 0;
+  }
+
+  .commentAuthor {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    margin-bottom: 4px;
+  }
+
+  .authorName {
+    font-size: 13px;
+    font-weight: 500;
+    color: var(--text-primary);
+    display: flex;
+    align-items: center;
+    gap: 6px;
+  }
+
+  .authorBadge {
+    display: inline-block;
+    padding: 2px 6px;
+    background: linear-gradient(135deg, #667eea, #764ba2);
+    color: white;
+    font-size: 10px;
+    font-weight: 700;
+    border-radius: 4px;
+    text-transform: uppercase;
+    letter-spacing: 0.5px;
+  }
+
+  .authorLikedBadge {
+    display: inline-flex;
+    align-items: center;
+    gap: 4px;
+    padding: 4px 8px;
+    margin-top: 4px;
+    margin-bottom: 4px;
+    background: linear-gradient(135deg, #ff6b6b, #ee5a6f);
+    color: white;
+    font-size: 11px;
+    font-weight: 500;
+    border-radius: 12px;
+    
+    svg {
+      width: 12px;
+      height: 12px;
+    }
+  }
+
+  .commentDate {
+    font-size: 12px;
+    color: var(--text-tertiary);
+  }
+
+  .commentText {
+    font-size: 14px;
+    color: var(--text-primary);
+    line-height: 1.5;
+    margin-bottom: 8px;
+    white-space: pre-wrap;
+  }
+
+  .timestamp {
+    color: #667eea;
+    cursor: pointer;
+    font-weight: 500;
+    text-decoration: underline;
+    text-decoration-color: transparent;
+    transition: all 0.2s ease;
+    padding: 2px 4px;
+    border-radius: 4px;
+    background: rgba(102, 126, 234, 0.1);
+
+    &:hover {
+      background: rgba(102, 126, 234, 0.2);
+      text-decoration-color: #667eea;
+      transform: translateY(-1px);
+    }
+
+    &:active {
+      transform: translateY(0);
+    }
+
+    [data-theme='dark'] & {
+      color: #8b9aff;
+      background: rgba(139, 154, 255, 0.15);
+
+      &:hover {
+        background: rgba(139, 154, 255, 0.25);
+        text-decoration-color: #8b9aff;
+      }
+    }
+  }
+
+  .commentActions {
+    display: flex;
+    align-items: center;
+    gap: 16px;
+  }
+
+  .actionButton {
+    display: flex;
+    align-items: center;
+    gap: 4px;
+    padding: 4px 8px;
+    border-radius: 18px;
+    background-color: transparent;
+    color: var(--text-secondary);
+    font-size: 12px;
+    transition: background-color 0.2s;
+
+    &:hover {
+      background-color: var(--bg-tertiary);
+    }
+
+    svg {
+      width: 16px;
+      height: 16px;
+    }
+  }
+
+  .replyButton {
+    padding: 4px 8px;
+    border-radius: 18px;
+    background-color: transparent;
+    color: var(--text-secondary);
+    font-size: 12px;
+    font-weight: 500;
+    transition: background-color 0.2s;
+
+    &:hover {
+      background-color: var(--bg-tertiary);
+    }
+  }
+
+  .deleteButton {
+    display: flex;
+    align-items: center;
+    gap: 6px;
+    padding: 6px 12px;
+    border-radius: 8px;
+    background: linear-gradient(135deg, rgba(239, 68, 68, 0.1) 0%, rgba(220, 38, 38, 0.1) 100%);
+    color: #ef4444;
+    border: 1px solid rgba(239, 68, 68, 0.3);
+    font-size: 12px;
+    font-weight: 500;
+    cursor: pointer;
+    transition: all 0.3s ease;
+
+    svg {
+      width: 14px;
+      height: 14px;
+    }
+
+    &:hover {
+      background: linear-gradient(135deg, #ef4444 0%, #dc2626 100%);
+      color: white;
+      border-color: #ef4444;
+      transform: translateY(-1px);
+      box-shadow: 0 2px 8px rgba(239, 68, 68, 0.3);
+    }
+  }
+
+  .authorLikeButton {
+    display: flex;
+    align-items: center;
+    gap: 4px;
+    padding: 4px 8px;
+    border-radius: 18px;
+    background-color: transparent;
+    color: var(--text-secondary);
+    font-size: 12px;
+    font-weight: 500;
+    transition: all 0.2s;
+    border: 1px solid transparent;
+
+    svg {
+      width: 14px;
+      height: 14px;
+    }
+
+    &:hover {
+      background-color: var(--bg-tertiary);
+      border-color: #ff6b6b;
+      color: #ff6b6b;
+    }
+
+    &.active {
+      background: linear-gradient(135deg, #ff6b6b, #ee5a6f);
+      color: white;
+      border-color: transparent;
+
+      &:hover {
+        background: linear-gradient(135deg, #ee5a6f, #ff6b6b);
+      }
+    }
+  }
+
+  .pinButton {
+    display: flex;
+    align-items: center;
+    gap: 4px;
+    padding: 4px 8px;
+    border-radius: 18px;
+    background-color: transparent;
+    color: var(--text-secondary);
+    font-size: 12px;
+    font-weight: 500;
+    transition: all 0.2s;
+    border: 1px solid transparent;
+
+    svg {
+      width: 14px;
+      height: 14px;
+    }
+
+    &:hover {
+      background-color: var(--bg-tertiary);
+      border-color: #f59e0b;
+      color: #f59e0b;
+    }
+
+    &.pinned {
+      background: linear-gradient(135deg, #f59e0b, #d97706);
+      color: white;
+      border-color: transparent;
+
+      &:hover {
+        background: linear-gradient(135deg, #d97706, #f59e0b);
+      }
+    }
+  }
+
+  .pinnedIcon {
+    color: #f59e0b;
+    margin-right: 4px;
+    animation: pinPulse 2s ease-in-out infinite;
+  }
+}
+
+@keyframes pinPulse {
+  0%, 100% {
+    opacity: 1;
+    transform: scale(1);
+  }
+  50% {
+    opacity: 0.7;
+    transform: scale(1.1);
+  }
+}
+
+.comment {
+  &.pinned {
+    background: linear-gradient(135deg, rgba(245, 158, 11, 0.05) 0%, rgba(217, 119, 6, 0.05) 100%);
+    border-left: 3px solid #f59e0b;
+    padding-left: 12px;
+  }
+}
+
+.replyForm {
+  margin-top: 12px;
+  padding: 12px;
+  background-color: var(--bg-tertiary);
+  border-radius: 8px;
+
+  input {
+    width: 100%;
+    padding: 8px 12px;
+    border: 1px solid var(--border-color);
+    border-radius: 8px;
+    background-color: var(--bg-primary);
+    color: var(--text-primary);
+    font-size: 14px;
+    outline: none;
+    margin-bottom: 8px;
+
+    &:focus {
+      border-color: var(--accent);
+    }
+  }
+
+  .replyActions {
+    display: flex;
+    justify-content: flex-end;
+    gap: 8px;
+
+    button {
+      padding: 6px 16px;
+      border-radius: 18px;
+      font-size: 14px;
+      font-weight: 500;
+      transition: background-color 0.2s;
+
+      &:first-child {
+        background-color: transparent;
+        color: var(--text-secondary);
+
+        &:hover {
+          background-color: var(--bg-secondary);
+        }
+      }
+
+      &:last-child {
+        background-color: var(--accent);
+        color: white;
+
+        &:hover:not(:disabled) {
+          background-color: var(--accent-hover);
+        }
+
+        &:disabled {
+          opacity: 0.5;
+          cursor: not-allowed;
+        }
+      }
+    }
+  }
+}
+
+.replies {
+  margin-top: 16px;
+  padding-left: 56px;
+  display: flex;
+  flex-direction: column;
+  gap: 16px;
+}
+
+.reply {
+  display: flex;
+  gap: 12px;
+}
+

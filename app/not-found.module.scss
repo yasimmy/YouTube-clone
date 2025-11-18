@@ -1,0 +1,121 @@
+.notFound {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  min-height: calc(100vh - 56px);
+  padding: 24px;
+  background-color: var(--bg-secondary);
+}
+
+.content {
+  text-align: center;
+  max-width: 500px;
+  animation: fadeIn 0.5s ease-out;
+}
+
+.code {
+  font-size: 120px;
+  font-weight: 900;
+  background: linear-gradient(135deg, #667eea, #764ba2, #000000);
+  background-size: 200% 200%;
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+  background-clip: text;
+  margin-bottom: 16px;
+  line-height: 1;
+  animation: gradient 3s ease infinite, float 3s ease-in-out infinite;
+}
+
+@keyframes float {
+  0%, 100% {
+    transform: translateY(0);
+  }
+  50% {
+    transform: translateY(-10px);
+  }
+}
+
+@keyframes fadeIn {
+  from {
+    opacity: 0;
+    transform: translateY(20px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+@keyframes gradient {
+  0% {
+    background-position: 0% 50%;
+  }
+  50% {
+    background-position: 100% 50%;
+  }
+  100% {
+    background-position: 0% 50%;
+  }
+}
+
+.title {
+  font-size: 32px;
+  font-weight: 700;
+  color: var(--text-primary);
+  margin-bottom: 16px;
+}
+
+.description {
+  font-size: 16px;
+  color: var(--text-secondary);
+  margin-bottom: 32px;
+  line-height: 1.6;
+}
+
+.actions {
+  display: flex;
+  gap: 16px;
+  justify-content: center;
+  flex-wrap: wrap;
+}
+
+.button,
+.buttonSecondary {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  padding: 12px 24px;
+  border-radius: 8px;
+  font-size: 16px;
+  font-weight: 500;
+  transition: transform 0.2s, box-shadow 0.2s;
+
+  &:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 4px 12px var(--shadow);
+  }
+
+  svg {
+    width: 20px;
+    height: 20px;
+  }
+}
+
+.button {
+  background-color: var(--accent);
+  color: white;
+
+  &:hover {
+    background-color: var(--accent-hover);
+  }
+}
+
+.buttonSecondary {
+  background-color: var(--bg-tertiary);
+  color: var(--text-primary);
+
+  &:hover {
+    background-color: var(--bg-secondary);
+  }
+}
+

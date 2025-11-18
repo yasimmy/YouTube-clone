@@ -1,0 +1,571 @@
+.avatarContainer {
+  position: relative;
+  display: inline-block;
+}
+
+.avatar {
+  position: relative;
+  border-radius: 50%;
+  overflow: hidden;
+  background: var(--bg-secondary);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  border: 3px solid transparent;
+  transition: all 0.2s;
+
+  img {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+  }
+
+  .placeholder {
+    width: 100%;
+    height: 100%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    color: white;
+    font-size: 40%;
+    font-weight: 700;
+    background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+    text-transform: uppercase;
+  }
+
+  // Frames
+  &.frame-none {
+    border: 3px solid transparent;
+  }
+
+  &.frame-gold {
+    border: 3px solid #ffd700;
+    box-shadow: 0 0 12px rgba(255, 215, 0, 0.4);
+  }
+
+  &.frame-silver {
+    border: 3px solid #c0c0c0;
+    box-shadow: 0 0 12px rgba(192, 192, 192, 0.4);
+  }
+
+  &.frame-bronze {
+    border: 3px solid #cd7f32;
+    box-shadow: 0 0 12px rgba(205, 127, 50, 0.4);
+  }
+
+  &.frame-rainbow {
+    border: 3px solid transparent;
+    background: linear-gradient(white, white) padding-box,
+      linear-gradient(45deg, #ff0000, #ff7f00, #ffff00, #00ff00, #0000ff, #4b0082, #9400d3) border-box;
+    box-shadow: 0 0 12px rgba(255, 0, 0, 0.3);
+  }
+
+  &.frame-premium {
+    border: 3px solid transparent;
+    background: linear-gradient(white, white) padding-box,
+      linear-gradient(135deg, #667eea 0%, #764ba2 100%) border-box;
+    box-shadow: 0 0 16px rgba(102, 126, 234, 0.5);
+  }
+
+  // Autumn frames
+  &.frame-autumn-leaves {
+    border: 3px solid transparent;
+    background: linear-gradient(white, white) padding-box,
+      linear-gradient(135deg, #fa709a, #fee140) border-box;
+    box-shadow: 0 0 12px rgba(250, 112, 154, 0.4);
+  }
+
+  &.frame-autumn-gold {
+    border: 3px solid #ffd700;
+    box-shadow: 0 0 12px rgba(255, 215, 0, 0.5);
+  }
+
+  &.frame-autumn-pumpkin {
+    border: 3px solid #ff8c00;
+    box-shadow: 0 0 12px rgba(255, 140, 0, 0.4);
+  }
+
+  // Winter frames
+  &.frame-winter-snow {
+    border: 3px solid #e0f2f1;
+    box-shadow: 0 0 12px rgba(224, 242, 241, 0.5);
+  }
+
+  &.frame-winter-frost {
+    border: 3px solid #b3e5fc;
+    box-shadow: 0 0 12px rgba(179, 229, 252, 0.5);
+  }
+
+  &.frame-winter-holiday {
+    border: 3px solid transparent;
+    background: linear-gradient(white, white) padding-box,
+      linear-gradient(135deg, #ff0000, #00ff00) border-box;
+    box-shadow: 0 0 12px rgba(255, 0, 0, 0.3);
+  }
+
+  // Spring frames
+  &.frame-spring-flowers {
+    border: 3px solid #ff9a9e;
+    box-shadow: 0 0 12px rgba(255, 154, 158, 0.4);
+  }
+
+  &.frame-spring-petals {
+    border: 3px solid #fecfef;
+    box-shadow: 0 0 12px rgba(254, 207, 239, 0.4);
+  }
+
+  &.frame-spring-bloom {
+    border: 3px solid transparent;
+    background: linear-gradient(white, white) padding-box,
+      linear-gradient(135deg, #ff9a9e, #fecfef) border-box;
+    box-shadow: 0 0 12px rgba(255, 154, 158, 0.4);
+  }
+
+  // Summer frames
+  &.frame-summer-waves {
+    border: 3px solid #4facfe;
+    box-shadow: 0 0 12px rgba(79, 172, 254, 0.4);
+  }
+
+  &.frame-summer-sun {
+    border: 3px solid #ffd700;
+    box-shadow: 0 0 16px rgba(255, 215, 0, 0.6);
+  }
+
+  &.frame-summer-beach {
+    border: 3px solid transparent;
+    background: linear-gradient(white, white) padding-box,
+      linear-gradient(135deg, #4facfe, #00f2fe) border-box;
+    box-shadow: 0 0 12px rgba(79, 172, 254, 0.4);
+  }
+
+  // Official frame
+  &.frame-official-gold {
+    border: 4px solid #ffd700;
+    box-shadow: 0 0 20px rgba(255, 215, 0, 0.8);
+    animation: official-glow 2s ease-in-out infinite;
+  }
+}
+
+@keyframes official-glow {
+  0%, 100% {
+    box-shadow: 0 0 20px rgba(255, 215, 0, 0.8);
+  }
+  50% {
+    box-shadow: 0 0 30px rgba(255, 215, 0, 1);
+  }
+}
+
+.badges {
+  position: absolute;
+  top: 100%;
+  left: 50%;
+  transform: translateX(-50%);
+  margin-top: 8px;
+  display: flex;
+  gap: 6px;
+  flex-wrap: wrap;
+  justify-content: center;
+  width: 100%;
+  min-width: max-content;
+}
+
+.badge {
+  position: relative;
+  border-radius: 10px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 14px;
+  color: white;
+  border: 2px solid var(--bg-primary);
+  transition: all 0.4s cubic-bezier(0.4, 0, 0.2, 1);
+  cursor: pointer;
+  backdrop-filter: blur(10px);
+  perspective: 1000px;
+  transform-style: preserve-3d;
+
+  width: 28px;
+  height: 28px;
+
+  // 3D Base shadow
+  box-shadow: 
+    0 4px 12px rgba(0, 0, 0, 0.2),
+    0 0 0 1px rgba(255, 255, 255, 0.1),
+    inset 0 1px 0 rgba(255, 255, 255, 0.2),
+    inset 0 -1px 0 rgba(0, 0, 0, 0.2);
+
+  // 3D shine effect
+  &::before {
+    content: '';
+    position: absolute;
+    top: 10%;
+    left: 10%;
+    width: 30%;
+    height: 30%;
+    background: linear-gradient(135deg, rgba(255, 255, 255, 0.4) 0%, transparent 100%);
+    border-radius: 50%;
+    opacity: 0.6;
+    transition: opacity 0.3s;
+  }
+
+  // 3D depth effect
+  &::after {
+    content: '';
+    position: absolute;
+    inset: -2px;
+    border-radius: 10px;
+    background: inherit;
+    opacity: 0.3;
+    filter: blur(8px);
+    z-index: -1;
+    transform: translateZ(-10px);
+    transition: all 0.4s;
+  }
+
+  svg {
+    position: relative;
+    z-index: 1;
+    filter: drop-shadow(0 2px 4px rgba(0, 0, 0, 0.3));
+    transition: transform 0.4s;
+  }
+
+  &:hover {
+    transform: translateY(-4px) translateZ(10px) rotateX(5deg) rotateY(5deg) scale(1.15);
+    box-shadow: 
+      0 12px 24px rgba(0, 0, 0, 0.3),
+      0 0 0 2px rgba(255, 255, 255, 0.3),
+      inset 0 2px 0 rgba(255, 255, 255, 0.3),
+      inset 0 -2px 0 rgba(0, 0, 0, 0.3),
+      0 0 30px rgba(102, 126, 234, 0.4);
+    z-index: 10;
+
+    &::before {
+      opacity: 1;
+    }
+
+    &::after {
+      opacity: 0.6;
+      transform: translateZ(-15px) scale(1.1);
+    }
+
+    svg {
+      transform: scale(1.1) rotateZ(5deg);
+    }
+  }
+
+  // 3D animation on mount
+  animation: badge3DEnter 0.6s cubic-bezier(0.4, 0, 0.2, 1);
+
+  .badgeTooltip {
+    position: absolute;
+    bottom: calc(100% + 10px);
+    left: 50%;
+    transform: translateX(-50%) scale(0.9);
+    background: rgba(0, 0, 0, 0.95);
+    color: white;
+    padding: 8px 12px;
+    border-radius: 8px;
+    font-size: 12px;
+    font-weight: 500;
+    white-space: nowrap;
+    opacity: 0;
+    pointer-events: none;
+    transition: all 0.2s cubic-bezier(0.4, 0, 0.2, 1);
+    z-index: 1000;
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.3);
+
+    &::after {
+      content: '';
+      position: absolute;
+      top: 100%;
+      left: 50%;
+      transform: translateX(-50%);
+      border: 6px solid transparent;
+      border-top-color: rgba(0, 0, 0, 0.95);
+    }
+  }
+
+  &:hover .badgeTooltip {
+    opacity: 1;
+    transform: translateX(-50%) scale(1);
+  }
+
+  // Badge-specific styles
+  &.badge-staff {
+    width: 30px;
+    height: 30px;
+    background: linear-gradient(135deg, #667eea 0%, #764ba2 50%, #f093fb 100%);
+    background-size: 200% 200%;
+    font-size: 16px;
+    animation: badgeGradient 3s ease infinite, badgeFloat 3s ease-in-out infinite;
+    box-shadow: 
+      0 6px 16px rgba(102, 126, 234, 0.5),
+      0 0 0 1px rgba(255, 255, 255, 0.2),
+      inset 0 2px 0 rgba(255, 255, 255, 0.3),
+      inset 0 -2px 0 rgba(0, 0, 0, 0.2);
+
+    &:hover {
+      box-shadow: 
+        0 16px 32px rgba(102, 126, 234, 0.7),
+        0 0 0 3px rgba(255, 255, 255, 0.3),
+        inset 0 3px 0 rgba(255, 255, 255, 0.4),
+        inset 0 -3px 0 rgba(0, 0, 0, 0.3),
+        0 0 40px rgba(102, 126, 234, 0.6);
+      animation: badgeGradient 1s ease infinite, badgeFloat 1.5s ease-in-out infinite;
+    }
+  }
+
+  &.badge-verified {
+    background: linear-gradient(135deg, #10b981 0%, #059669 50%, #34d399 100%);
+    background-size: 200% 200%;
+    animation: badgeGradient 3s ease infinite;
+    box-shadow: 
+      0 6px 16px rgba(16, 185, 129, 0.5),
+      0 0 0 1px rgba(255, 255, 255, 0.2),
+      inset 0 2px 0 rgba(255, 255, 255, 0.3),
+      inset 0 -2px 0 rgba(0, 0, 0, 0.2);
+
+    &:hover {
+      box-shadow: 
+        0 16px 32px rgba(16, 185, 129, 0.7),
+        0 0 0 3px rgba(255, 255, 255, 0.3),
+        inset 0 3px 0 rgba(255, 255, 255, 0.4),
+        inset 0 -3px 0 rgba(0, 0, 0, 0.3),
+        0 0 40px rgba(16, 185, 129, 0.6);
+    }
+  }
+
+  &.badge-premium {
+    background: linear-gradient(135deg, #fbbf24 0%, #f59e0b 50%, #fcd34d 100%);
+    background-size: 200% 200%;
+    animation: badgeGradient 3s ease infinite, badgeShine 2s ease-in-out infinite;
+    box-shadow: 
+      0 6px 16px rgba(251, 191, 36, 0.5),
+      0 0 0 1px rgba(255, 255, 255, 0.2),
+      inset 0 2px 0 rgba(255, 255, 255, 0.4),
+      inset 0 -2px 0 rgba(0, 0, 0, 0.2);
+
+    &:hover {
+      box-shadow: 
+        0 16px 32px rgba(251, 191, 36, 0.7),
+        0 0 0 3px rgba(255, 255, 255, 0.3),
+        inset 0 3px 0 rgba(255, 255, 255, 0.5),
+        inset 0 -3px 0 rgba(0, 0, 0, 0.3),
+        0 0 40px rgba(251, 191, 36, 0.6);
+    }
+  }
+
+  &.badge-partner {
+    background: linear-gradient(135deg, #8b5cf6 0%, #7c3aed 50%, #a78bfa 100%);
+    background-size: 200% 200%;
+    animation: badgeGradient 3s ease infinite;
+    box-shadow: 
+      0 6px 16px rgba(139, 92, 246, 0.5),
+      0 0 0 1px rgba(255, 255, 255, 0.2),
+      inset 0 2px 0 rgba(255, 255, 255, 0.3),
+      inset 0 -2px 0 rgba(0, 0, 0, 0.2);
+
+    &:hover {
+      box-shadow: 
+        0 16px 32px rgba(139, 92, 246, 0.7),
+        0 0 0 3px rgba(255, 255, 255, 0.3),
+        inset 0 3px 0 rgba(255, 255, 255, 0.4),
+        inset 0 -3px 0 rgba(0, 0, 0, 0.3),
+        0 0 40px rgba(139, 92, 246, 0.6);
+    }
+  }
+
+  &.badge-creator {
+    background: linear-gradient(135deg, #ec4899 0%, #be185d 50%, #f472b6 100%);
+    background-size: 200% 200%;
+    animation: badgeGradient 3s ease infinite;
+    box-shadow: 
+      0 6px 16px rgba(236, 72, 153, 0.5),
+      0 0 0 1px rgba(255, 255, 255, 0.2),
+      inset 0 2px 0 rgba(255, 255, 255, 0.3),
+      inset 0 -2px 0 rgba(0, 0, 0, 0.2);
+
+    &:hover {
+      box-shadow: 
+        0 16px 32px rgba(236, 72, 153, 0.7),
+        0 0 0 3px rgba(255, 255, 255, 0.3),
+        inset 0 3px 0 rgba(255, 255, 255, 0.4),
+        inset 0 -3px 0 rgba(0, 0, 0, 0.3),
+        0 0 40px rgba(236, 72, 153, 0.6);
+    }
+  }
+
+  // Seasonal badges with 3D effects
+  &.badge-pumpkin {
+    background: linear-gradient(135deg, #ff8c00 0%, #ff6b00 50%, #ffa500 100%);
+    background-size: 200% 200%;
+    animation: badgeGradient 3s ease infinite;
+    box-shadow: 
+      0 6px 16px rgba(255, 140, 0, 0.5),
+      0 0 0 1px rgba(255, 255, 255, 0.2),
+      inset 0 2px 0 rgba(255, 255, 255, 0.3),
+      inset 0 -2px 0 rgba(0, 0, 0, 0.2);
+  }
+
+  &.badge-golden-leaf {
+    background: linear-gradient(135deg, #ffd700 0%, #ffb300 50%, #ffed4e 100%);
+    background-size: 200% 200%;
+    animation: badgeGradient 3s ease infinite, badgeShine 2s ease-in-out infinite;
+    box-shadow: 
+      0 6px 16px rgba(255, 215, 0, 0.5),
+      0 0 0 1px rgba(255, 255, 255, 0.2),
+      inset 0 2px 0 rgba(255, 255, 255, 0.4),
+      inset 0 -2px 0 rgba(0, 0, 0, 0.2);
+  }
+
+  &.badge-santa {
+    background: linear-gradient(135deg, #ef4444 0%, #dc2626 50%, #f87171 100%);
+    background-size: 200% 200%;
+    animation: badgeGradient 3s ease infinite;
+    box-shadow: 
+      0 6px 16px rgba(239, 68, 68, 0.5),
+      0 0 0 1px rgba(255, 255, 255, 0.2),
+      inset 0 2px 0 rgba(255, 255, 255, 0.3),
+      inset 0 -2px 0 rgba(0, 0, 0, 0.2);
+  }
+
+  &.badge-ice-master {
+    background: linear-gradient(135deg, #06b6d4 0%, #0891b2 50%, #22d3ee 100%);
+    background-size: 200% 200%;
+    animation: badgeGradient 3s ease infinite, badgeFloat 3s ease-in-out infinite;
+    box-shadow: 
+      0 6px 16px rgba(6, 182, 212, 0.5),
+      0 0 0 1px rgba(255, 255, 255, 0.2),
+      inset 0 2px 0 rgba(255, 255, 255, 0.3),
+      inset 0 -2px 0 rgba(0, 0, 0, 0.2);
+  }
+
+  &.badge-winter-king {
+    background: linear-gradient(135deg, #3b82f6 0%, #2563eb 50%, #60a5fa 100%);
+    background-size: 200% 200%;
+    animation: badgeGradient 3s ease infinite, badge-glow 2s ease-in-out infinite, badgeFloat 3s ease-in-out infinite;
+    box-shadow: 
+      0 6px 16px rgba(59, 130, 246, 0.5),
+      0 0 0 1px rgba(255, 255, 255, 0.2),
+      inset 0 2px 0 rgba(255, 255, 255, 0.3),
+      inset 0 -2px 0 rgba(0, 0, 0, 0.2);
+  }
+
+  &.badge-february-heart {
+    background: linear-gradient(135deg, #f472b6 0%, #ec4899 50%, #f9a8d4 100%);
+    background-size: 200% 200%;
+    animation: badgeGradient 3s ease infinite;
+    box-shadow: 
+      0 6px 16px rgba(244, 114, 182, 0.5),
+      0 0 0 1px rgba(255, 255, 255, 0.2),
+      inset 0 2px 0 rgba(255, 255, 255, 0.3),
+      inset 0 -2px 0 rgba(0, 0, 0, 0.2);
+  }
+
+  &.badge-sprout {
+    background: linear-gradient(135deg, #22c55e 0%, #16a34a 50%, #4ade80 100%);
+    background-size: 200% 200%;
+    animation: badgeGradient 3s ease infinite;
+    box-shadow: 
+      0 6px 16px rgba(34, 197, 94, 0.5),
+      0 0 0 1px rgba(255, 255, 255, 0.2),
+      inset 0 2px 0 rgba(255, 255, 255, 0.3),
+      inset 0 -2px 0 rgba(0, 0, 0, 0.2);
+  }
+
+  &.badge-blooming {
+    background: linear-gradient(135deg, #f472b6 0%, #ec4899 50%, #f9a8d4 100%);
+    background-size: 200% 200%;
+    animation: badgeGradient 3s ease infinite, badgeFloat 3s ease-in-out infinite;
+    box-shadow: 
+      0 6px 16px rgba(244, 114, 182, 0.5),
+      0 0 0 1px rgba(255, 255, 255, 0.2),
+      inset 0 2px 0 rgba(255, 255, 255, 0.3),
+      inset 0 -2px 0 rgba(0, 0, 0, 0.2);
+  }
+
+  &.badge-spring-keeper {
+    background: linear-gradient(135deg, #a855f7 0%, #9333ea 50%, #c084fc 100%);
+    background-size: 200% 200%;
+    animation: badgeGradient 3s ease infinite;
+    box-shadow: 
+      0 6px 16px rgba(168, 85, 247, 0.5),
+      0 0 0 1px rgba(255, 255, 255, 0.2),
+      inset 0 2px 0 rgba(255, 255, 255, 0.3),
+      inset 0 -2px 0 rgba(0, 0, 0, 0.2);
+  }
+
+  &.badge-beach-goer {
+    background: linear-gradient(135deg, #06b6d4 0%, #0891b2 50%, #22d3ee 100%);
+    background-size: 200% 200%;
+    animation: badgeGradient 3s ease infinite;
+    box-shadow: 
+      0 6px 16px rgba(6, 182, 212, 0.5),
+      0 0 0 1px rgba(255, 255, 255, 0.2),
+      inset 0 2px 0 rgba(255, 255, 255, 0.3),
+      inset 0 -2px 0 rgba(0, 0, 0, 0.2);
+  }
+
+  &.badge-sun-lord {
+    background: linear-gradient(135deg, #fbbf24 0%, #f59e0b 50%, #fcd34d 100%);
+    background-size: 200% 200%;
+    animation: badgeGradient 3s ease infinite, badge-glow 2s ease-in-out infinite, badgeShine 2s ease-in-out infinite;
+    box-shadow: 
+      0 6px 16px rgba(251, 191, 36, 0.5),
+      0 0 0 1px rgba(255, 255, 255, 0.2),
+      inset 0 2px 0 rgba(255, 255, 255, 0.4),
+      inset 0 -2px 0 rgba(0, 0, 0, 0.2);
+  }
+}
+
+@keyframes badge3DEnter {
+  0% {
+    transform: translateZ(-20px) rotateX(-90deg);
+    opacity: 0;
+  }
+  60% {
+    transform: translateZ(5px) rotateX(5deg);
+  }
+  100% {
+    transform: translateZ(0) rotateX(0deg);
+    opacity: 1;
+  }
+}
+
+@keyframes badge-glow {
+  0%, 100% {
+    box-shadow: 0 2px 8px rgba(59, 130, 246, 0.4), 0 0 0 1px rgba(255, 255, 255, 0.1);
+  }
+  50% {
+    box-shadow: 0 4px 16px rgba(59, 130, 246, 0.7), 0 0 0 2px rgba(255, 255, 255, 0.3);
+  }
+}
+
+@keyframes badgeGradient {
+  0%, 100% {
+    background-position: 0% 50%;
+  }
+  50% {
+    background-position: 100% 50%;
+  }
+}
+
+@keyframes badgeFloat {
+  0%, 100% {
+    transform: translateY(0) translateZ(0);
+  }
+  50% {
+    transform: translateY(-3px) translateZ(5px);
+  }
+}
+
+@keyframes badgeShine {
+  0%, 100% {
+    filter: brightness(1);
+  }
+  50% {
+    filter: brightness(1.3);
+  }
+}
+

@@ -1,0 +1,170 @@
+.adventCalendar {
+  padding: 24px;
+  background: var(--bg-primary);
+  border-radius: 12px;
+  margin-bottom: 24px;
+}
+
+.title {
+  font-size: 24px;
+  font-weight: 600;
+  color: var(--text-primary);
+  margin-bottom: 24px;
+  text-align: center;
+}
+
+.monthSelector {
+  display: flex;
+  gap: 12px;
+  justify-content: center;
+  margin-bottom: 24px;
+
+  button {
+    padding: 8px 16px;
+    background: var(--bg-secondary);
+    border: 2px solid var(--border-color);
+    border-radius: 8px;
+    color: var(--text-primary);
+    font-size: 14px;
+    font-weight: 500;
+    cursor: pointer;
+    transition: all 0.2s;
+
+    &:hover {
+      background: var(--bg-tertiary);
+    }
+
+    &.active {
+      background: var(--accent);
+      color: white;
+      border-color: var(--accent);
+    }
+  }
+}
+
+.dayWrapper {
+  position: relative;
+  transition: transform 0.2s ease;
+
+  &:hover button:not(:disabled) {
+    transform: scale(1.05);
+  }
+
+  &:active button:not(:disabled) {
+    transform: scale(0.95);
+  }
+}
+
+.calendarGrid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(80px, 1fr));
+  gap: 12px;
+  max-width: 800px;
+  margin: 0 auto;
+}
+
+.day {
+  position: relative;
+  aspect-ratio: 1;
+  background: var(--bg-secondary);
+  border: 2px solid var(--border-color);
+  border-radius: 12px;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: 4px;
+  cursor: pointer;
+  transition: all 0.2s;
+
+  &:hover:not(:disabled) {
+    background: var(--bg-tertiary);
+    border-color: var(--accent);
+    transform: translateY(-2px);
+  }
+
+  &:disabled {
+    cursor: not-allowed;
+    opacity: 0.5;
+  }
+
+  &.locked {
+    opacity: 0.4;
+    cursor: not-allowed;
+  }
+
+  &.claimed {
+    background: linear-gradient(135deg, #667eea, #764ba2);
+    border-color: #667eea;
+    color: white;
+  }
+
+  &.today {
+    border-color: var(--accent);
+    box-shadow: 0 0 10px rgba(102, 126, 234, 0.5);
+  }
+
+  &.rare {
+    border-color: #ffd700;
+    box-shadow: 0 0 10px rgba(255, 215, 0, 0.3);
+  }
+
+  &.legendary {
+    border-color: #ff6b6b;
+    box-shadow: 0 0 15px rgba(255, 107, 107, 0.5);
+    animation: legendary-pulse 2s ease-in-out infinite;
+  }
+}
+
+.dayNumber {
+  font-size: 18px;
+  font-weight: 700;
+}
+
+.checkIcon,
+.lockIcon,
+.giftIcon {
+  width: 20px;
+  height: 20px;
+}
+
+.rewardTooltip {
+  position: absolute;
+  bottom: calc(100% + 8px);
+  left: 50%;
+  transform: translateX(-50%);
+  background: rgba(0, 0, 0, 0.9);
+  color: white;
+  padding: 8px 12px;
+  border-radius: 8px;
+  font-size: 12px;
+  white-space: nowrap;
+  opacity: 0;
+  pointer-events: none;
+  transition: opacity 0.2s;
+  z-index: 1000;
+
+  &::after {
+    content: '';
+    position: absolute;
+    top: 100%;
+    left: 50%;
+    transform: translateX(-50%);
+    border: 6px solid transparent;
+    border-top-color: rgba(0, 0, 0, 0.9);
+  }
+}
+
+.day:hover .rewardTooltip {
+  opacity: 1;
+}
+
+@keyframes legendary-pulse {
+  0%, 100% {
+    box-shadow: 0 0 15px rgba(255, 107, 107, 0.5);
+  }
+  50% {
+    box-shadow: 0 0 25px rgba(255, 107, 107, 0.8);
+  }
+}
+
