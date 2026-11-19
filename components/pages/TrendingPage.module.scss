@@ -1,61 +1,13 @@
-.trendingPage {
-  width: 100%;
-}
-
-.title {
-  font-size: 24px;
-  font-weight: 700;
-  color: var(--text-primary);
-  margin-bottom: 24px;
-}
-
-.videoGrid {
-  display: grid;
-  grid-template-columns: repeat(auto-fill, minmax(320px, 1fr));
-  gap: 24px;
-
-  @media (max-width: 768px) {
-    grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
-    gap: 16px;
-  }
-
-  @media (max-width: 480px) {
-    grid-template-columns: 1fr;
-  }
-}
-
-.empty {
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  padding: 64px 24px;
-  text-align: center;
-
-  p {
-    font-size: 16px;
-    color: var(--text-secondary);
-  }
-}
-
-.loading {
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  min-height: 400px;
-}
-
-.spinner {
-  width: 48px;
-  height: 48px;
-  border: 4px solid var(--border-color);
-  border-top-color: var(--accent);
-  border-radius: 50%;
-  animation: spin 1s linear infinite;
-}
-
-@keyframes spin {
-  to {
-    transform: rotate(360deg);
-  }
-}
-
+.trendingPage { width: 100%; min-height: calc(100vh - 64px); padding: 34px; background: #080808; }
+.title { margin: 0 0 28px; color: #fff; font-size: 31px; font-weight: 700; letter-spacing: -.045em; }
+.title::before { content: 'WAVE / DISCOVER'; display: block; margin-bottom: 9px; color: #6ee7b7; font-size: 10px; font-weight: 700; letter-spacing: .18em; }
+.videoGrid { display: grid; grid-template-columns: repeat(auto-fill, minmax(300px, 1fr)); gap: 24px; }
+.empty { display: flex; flex-direction: column; align-items: center; justify-content: center; min-height: 480px; padding: 36px; text-align: center; background: radial-gradient(circle at 50% 30%, rgba(52,211,153,.07), transparent 35%), rgba(255,255,255,.025); border: 1px solid rgba(255,255,255,.09); border-radius: 24px; }
+.emptyMark { display: flex; align-items: center; justify-content: center; width: 62px; height: 62px; margin-bottom: 18px; color: #090909; background: #f4f4f5; border-radius: 19px; box-shadow: 0 0 28px rgba(52,211,153,.16); font-size: 28px; }
+.empty p { margin: 0 0 8px; color: #fff; font-size: 17px; font-weight: 600; }
+.empty span { color: #71717a; font-size: 13px; }
+.loading { display: flex; align-items: center; justify-content: center; min-height: calc(100vh - 64px); background: #080808; }
+.spinner { width: 42px; height: 42px; border: 3px solid rgba(255,255,255,.1); border-top-color: #6ee7b7; border-radius: 50%; animation: spin 1s linear infinite; }
+@keyframes spin { to { transform: rotate(360deg); } }
+@media (max-width: 768px) { .trendingPage { padding: 24px 16px; } .videoGrid { grid-template-columns: repeat(auto-fill, minmax(260px, 1fr)); gap: 16px; } }
+@media (max-width: 480px) { .trendingPage { padding: 20px 12px; } .title { font-size: 26px; } .videoGrid { grid-template-columns: 1fr; } }

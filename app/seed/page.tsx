@@ -1,25 +1,40 @@
 'use client'
 
-import { useState } from 'react'
+import { useEffect, useState } from 'react'
 import Link from 'next/link'
 import { seedDatabase } from '@/lib/seed'
 import { useRouter } from 'next/navigation'
 import toast from 'react-hot-toast'
 import { FiCheckCircle, FiAlertCircle, FiHome } from 'react-icons/fi'
 import styles from './seed.module.scss'
+import { useStore } from '@/lib/store'
 
 export default function SeedPage() {
   const router = useRouter()
+  const user = useStore((state) => state.user)
+  const [authorized, setAuthorized] = useState(false)
   const [seeded, setSeeded] = useState(false)
   const [loading, setLoading] = useState(false)
   const [error, setError] = useState<string | null>(null)
+  const [credentials, setCredentials] = useState<{ adminPassword?: string; officialPassword?: string } | null>(null)
+
+  useEffect(() => {
+    let activeUser = user
+    if (!activeUser || !['own', 'admin'].includes(activeUser.role || '')) {
+      router.replace('/')
+      return
+    }
+    setAuthorized(true)
+  }, [router, user])
+
+  if (!authorized) return null
 
   const handleSeed = () => {
     setLoading(true)
     setError(null)
     
     try {
-      seedDatabase()
+      setCredentials(seedDatabase())
       setSeeded(true)
       toast.success('База данных заполнена тестовыми данными!')
       
@@ -54,6 +69,14 @@ export default function SeedPage() {
           <div className={styles.success}>
             <FiCheckCircle className={styles.icon} />
             <h2>База данных успешно заполнена!</h2>
+            {credentials && (credentials.adminPassword || credentials.officialPassword) && (
+              <div>
+                <p>Одноразовые пароли созданных аккаунтов:</p>
+                {credentials.adminPassword && <p><strong>admin:</strong> {credentials.adminPassword}</p>}
+                {credentials.officialPassword && <p><strong>Official Channel:</strong> {credentials.officialPassword}</p>}
+                <p>Сохраните их сейчас — повторный запуск их не покажет.</p>
+              </div>
+            )}
             <p>Перенаправление на главную страницу...</p>
             <Link href="/" className={styles.button}>
               <FiHome />

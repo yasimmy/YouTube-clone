@@ -164,8 +164,6 @@ export function Notifications() {
                         window.location.href = notification.link
                       }
                     }}
-                    whileHover={{ scale: 1.02 }}
-                    whileTap={{ scale: 0.98 }}
                   >
                     <div
                       className={styles.notificationIcon}

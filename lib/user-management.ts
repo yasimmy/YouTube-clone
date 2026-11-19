@@ -4,30 +4,18 @@ import { db } from './db'
 import { addUserActivity } from './user-activity'
 import { log } from './logging'
 import { notifyWarning, notifyChannelBlocked } from './notifications'
+import { hashPassword } from './auth'
 
 // Reset password (admin only)
 export async function resetUserPassword(userId: string, adminId: string, newPassword?: string): Promise<boolean> {
   const user = db.users.findById(userId)
   if (!user) return false
   
-  // For admin user, set password to "admin" (hashed)
-  let password: string
-  if (user.email === 'admin@yt2.com' || user.username === 'admin') {
-    // Hash "admin" password
-    const bcrypt = await import('bcryptjs')
-    password = await bcrypt.hash('admin', 10)
-  } else {
-    password = newPassword || generateRandomPassword()
-    // In production, hash this
-    if (!newPassword) {
-      const bcrypt = await import('bcryptjs')
-      password = await bcrypt.hash(password, 10)
-    }
-  }
+  const password = newPassword || generateRandomPassword()
   
   // Also unblock if blocked
   db.users.update(userId, {
-    password: password,
+    passwordHash: hashPassword(password),
     isBlocked: false,
     blockedUntil: undefined,
   })

@@ -569,3 +569,88 @@
   }
 }
 
+/* Wave badge system: quiet glass chips instead of legacy 3D gradients */
+.badges {
+  gap: 5px;
+  margin-top: 5px;
+}
+
+.badge,
+.badge.badge-staff,
+.badge.badge-verified,
+.badge.badge-premium,
+.badge.badge-partner,
+.badge.badge-creator,
+.badge.badge-pumpkin,
+.badge.badge-golden-leaf,
+.badge.badge-santa,
+.badge.badge-ice-master,
+.badge.badge-winter-king,
+.badge.badge-february-heart,
+.badge.badge-sprout,
+.badge.badge-blooming,
+.badge.badge-spring-keeper,
+.badge.badge-beach-goer,
+.badge.badge-sun-lord {
+  width: 26px;
+  height: 26px;
+  color: #6ee7b7;
+  background: rgba(16, 16, 16, 0.94);
+  border: 1px solid rgba(110, 231, 183, 0.42);
+  border-radius: 9px;
+  box-shadow: 0 6px 14px rgba(0, 0, 0, 0.28), inset 0 1px 0 rgba(255, 255, 255, 0.12);
+  animation: none;
+  transform: none;
+  transition: color 180ms ease, background 180ms ease, border-color 180ms ease, transform 180ms ease;
+
+  &::before,
+  &::after {
+    display: none;
+  }
+
+  svg {
+    width: 14px;
+    height: 14px;
+    filter: none;
+  }
+
+  &:hover {
+    z-index: 10;
+    color: #090909;
+    background: #6ee7b7;
+    border-color: #6ee7b7;
+    box-shadow: 0 8px 18px rgba(110, 231, 183, 0.22);
+    transform: translateY(-2px);
+    animation: none;
+  }
+}
+
+.badgeTooltip {
+  bottom: calc(100% + 8px);
+  padding: 7px 10px;
+  color: #f4f4f5;
+  background: rgba(16, 16, 16, 0.98);
+  border: 1px solid rgba(255, 255, 255, 0.12);
+  border-radius: 9px;
+  box-shadow: 0 12px 28px rgba(0, 0, 0, 0.36);
+  font-size: 11px;
+}
+
+.badge[data-rarity='common'] { --rarity-color: #a1a1aa; }
+.badge[data-rarity='rare'] { --rarity-color: #60a5fa; }
+.badge[data-rarity='epic'] { --rarity-color: #c084fc; }
+.badge[data-rarity='legendary'] { --rarity-color: #fbbf24; }
+
+.badge[data-rarity] {
+  color: var(--rarity-color);
+  background: color-mix(in srgb, var(--rarity-color) 12%, #101010 88%);
+  border-color: color-mix(in srgb, var(--rarity-color) 62%, transparent);
+  box-shadow: 0 6px 14px color-mix(in srgb, var(--rarity-color) 18%, transparent), inset 0 1px 0 rgba(255,255,255,.12);
+}
+
+.badge[data-rarity]:hover {
+  color: #090909;
+  background: var(--rarity-color);
+  border-color: var(--rarity-color);
+}
+

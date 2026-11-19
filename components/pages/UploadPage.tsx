@@ -9,7 +9,7 @@ import { useStore } from '@/lib/store'
 import { db } from '@/lib/db'
 import { notifyNewVideo } from '@/lib/notifications'
 import toast from 'react-hot-toast'
-import { FiUpload, FiImage, FiX } from 'react-icons/fi'
+import { FiUpload, FiImage, FiX, FiChevronDown, FiCheck, FiVideo, FiGlobe, FiLock } from 'react-icons/fi'
 import styles from './UploadPage.module.scss'
 import { motion } from 'framer-motion'
 
@@ -44,10 +44,13 @@ export function UploadPage() {
   const [videoPreview, setVideoPreview] = useState<string | null>(null)
   const [thumbnailPreview, setThumbnailPreview] = useState<string | null>(null)
   const [uploading, setUploading] = useState(false)
+  const [openMenu, setOpenMenu] = useState<'category' | 'privacy' | null>(null)
 
   const {
     register,
     handleSubmit,
+    setValue,
+    watch,
     formState: { errors },
   } = useForm<UploadForm>({
     resolver: zodResolver(uploadSchema),
@@ -56,6 +59,14 @@ export function UploadPage() {
       category: '',
     },
   })
+
+  const selectedCategory = watch('category')
+  const selectedPrivacy = watch('privacy')
+  const privacyOptions = [
+    { value: 'public' as const, label: 'Публичное', hint: 'Доступно всем', icon: FiGlobe },
+    { value: 'unlisted' as const, label: 'Непубличное', hint: 'Только по ссылке', icon: FiLock },
+    { value: 'subscribers' as const, label: 'Подписчики', hint: 'Только вашим подписчикам', icon: FiLock },
+  ]
 
   const handleVideoChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     const file = e.target.files?.[0]
@@ -110,16 +121,14 @@ export function UploadPage() {
       // Simulate upload
       await new Promise((resolve) => setTimeout(resolve, 2000))
 
-      // Save thumbnail if provided
-      let thumbnailUrl = thumbnailPreview || videoPreview || ''
+      // Upload media to the server; only stable URLs are stored in the database.
+      const { saveThumbnail, saveVideo } = await import('@/lib/file-persistence')
+      const videoUrl = await saveVideo(videoFile)
+      let thumbnailUrl = ''
       if (thumbnailFile) {
-        const { saveThumbnail } = await import('@/lib/file-persistence')
         const videoId = Date.now().toString()
         thumbnailUrl = await saveThumbnail(videoId, thumbnailFile)
       }
-
-      // In production, upload files to storage (S3, Cloudinary, etc.)
-      const videoUrl = URL.createObjectURL(videoFile)
 
       // Get video duration (simulated)
       const duration = 120 // In production, extract from video file
@@ -189,6 +198,7 @@ export function UploadPage() {
         <form onSubmit={handleSubmit(onSubmit)} className={styles.form}>
           <div className={styles.uploadSection}>
             <div className={styles.videoUpload}>
+              <div className={styles.mediaLabel}><FiVideo /><span>Видео</span><small>обязательно</small></div>
               {videoPreview ? (
                 <div className={styles.preview}>
                   <video src={videoPreview} controls className={styles.videoPreview} />
@@ -218,6 +228,7 @@ export function UploadPage() {
             </div>
 
             <div className={styles.thumbnailUpload}>
+              <div className={styles.mediaLabel}><FiImage /><span>Обложка</span><small>необязательно</small></div>
               {thumbnailPreview ? (
                 <div className={styles.preview}>
                   <img src={thumbnailPreview} alt="Thumbnail" className={styles.thumbnailPreview} />
@@ -279,28 +290,43 @@ export function UploadPage() {
               />
             </div>
 
-            <div className={styles.field}>
+            <div className={`${styles.field} ${styles.selectField}`}>
               <label htmlFor="category">Категория *</label>
-              <select id="category" {...register('category')}>
-                <option value="">Выберите категорию</option>
-                {categories.map((cat) => (
-                  <option key={cat} value={cat}>
-                    {cat}
-                  </option>
-                ))}
-              </select>
+              <div className={styles.customSelect}>
+                <button type="button" className={styles.selectTrigger} onClick={() => setOpenMenu(openMenu === 'category' ? null : 'category')} aria-expanded={openMenu === 'category'}>
+                  <span>{selectedCategory || 'Выберите категорию'}</span><FiChevronDown />
+                </button>
+                {openMenu === 'category' && (
+                  <div className={styles.selectMenu}>
+                    {categories.map((cat) => (
+                      <button key={cat} type="button" className={`${styles.selectOption} ${selectedCategory === cat ? styles.selected : ''}`} onClick={() => { setValue('category', cat, { shouldValidate: true }); setOpenMenu(null) }}>
+                        <span>{cat}</span>{selectedCategory === cat && <FiCheck />}
+                      </button>
+                    ))}
+                  </div>
+                )}
+              </div>
               {errors.category && (
                 <span className={styles.error}>{errors.category.message}</span>
               )}
             </div>
 
-            <div className={styles.field}>
+            <div className={`${styles.field} ${styles.selectField}`}>
               <label htmlFor="privacy">Приватность</label>
-              <select id="privacy" {...register('privacy')}>
-                <option value="public">Публичное</option>
-                <option value="unlisted">Непубличное</option>
-                <option value="subscribers">Только для подписчиков</option>
-              </select>
+              <div className={styles.customSelect}>
+                <button type="button" className={styles.selectTrigger} onClick={() => setOpenMenu(openMenu === 'privacy' ? null : 'privacy')} aria-expanded={openMenu === 'privacy'}>
+                  <span>{privacyOptions.find((option) => option.value === selectedPrivacy)?.label}</span><FiChevronDown />
+                </button>
+                {openMenu === 'privacy' && (
+                  <div className={styles.selectMenu}>
+                    {privacyOptions.map((option) => { const Icon = option.icon; return (
+                      <button key={option.value} type="button" className={`${styles.selectOption} ${selectedPrivacy === option.value ? styles.selected : ''}`} onClick={() => { setValue('privacy', option.value); setOpenMenu(null) }}>
+                        <Icon /><span><strong>{option.label}</strong><small>{option.hint}</small></span>{selectedPrivacy === option.value && <FiCheck />}
+                      </button>
+                    ) })}
+                  </div>
+                )}
+              </div>
             </div>
           </div>
 

@@ -40,7 +40,7 @@ const badgeIcons: Partial<Record<UserBadge, React.ReactNode>> = {
 }
 
 const badgeLabels: Record<UserBadge, string> = {
-  staff: 'Сотрудник YT',
+  staff: 'wave. staff',
   verified: 'Верифицированный',
   premium: 'Премиум',
   partner: 'Партнер',
@@ -56,6 +56,12 @@ const badgeLabels: Record<UserBadge, string> = {
   'spring-keeper': 'Хранитель Весны',
   'beach-goer': 'Пляжник',
   'sun-lord': 'Повелитель солнца',
+}
+
+const badgeRarity: Record<UserBadge, 'common' | 'rare' | 'epic' | 'legendary'> = {
+  staff: 'legendary', verified: 'epic', premium: 'epic', partner: 'legendary', creator: 'rare',
+  pumpkin: 'common', 'golden-leaf': 'rare', santa: 'rare', 'ice-master': 'epic', 'winter-king': 'legendary',
+  'february-heart': 'rare', sprout: 'common', blooming: 'rare', 'spring-keeper': 'epic', 'beach-goer': 'rare', 'sun-lord': 'legendary',
 }
 
 export function UserAvatar({ user, size = 40, showBadges = true, showFrame = true }: UserAvatarProps) {
@@ -104,6 +110,7 @@ export function UserAvatar({ user, size = 40, showBadges = true, showFrame = tru
               <div
                 key={badge}
                 className={`${styles.badge} ${styles[`badge-${badge}`]}`}
+                data-rarity={badgeRarity[badge] || 'common'}
               >
                 {badgeIcon}
                 <div className={styles.badgeTooltip}>

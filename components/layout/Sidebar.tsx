@@ -12,20 +12,13 @@ import {
   FiFileText,
   FiActivity,
   FiBookOpen,
-  FiRotateCw,
-  FiClock,
-  FiThumbsUp,
-  FiPlay,
   FiSettings,
   FiHelpCircle,
   FiFlag,
-  FiShield,
   FiGift,
-  FiShoppingBag,
   FiGitBranch,
 } from 'react-icons/fi'
 import styles from './Sidebar.module.scss'
-import { useEffect, useState } from 'react'
 
 const menuItems = [
   { icon: FiHome, label: 'Главная', href: '/' },
@@ -38,13 +31,6 @@ const menuItems = [
   { icon: FiBookOpen, label: 'Обучение', href: '/category/education' },
 ]
 
-const userMenuItems = [
-  { icon: FiRotateCw, label: 'История', href: '/history' },
-  { icon: FiPlay, label: 'Мои видео', href: '/my-videos' },
-  { icon: FiClock, label: 'Смотреть позже', href: '/watch-later' },
-  { icon: FiThumbsUp, label: 'Понравившиеся', href: '/liked' },
-]
-
 const settingsItems = [
   { icon: FiSettings, label: 'Настройки', href: '/settings' },
   { icon: FiHelpCircle, label: 'Справка', href: '/help' },
@@ -55,7 +41,7 @@ const settingsItems = [
 
 export function Sidebar() {
   const pathname = usePathname()
-  const { sidebarOpen, user } = useStore()
+  const sidebarOpen = useStore((state) => state.sidebarOpen)
 
   return (
     <aside className={`${styles.sidebar} ${sidebarOpen ? styles.sidebarOpen : ''}`}>
@@ -69,6 +55,7 @@ export function Sidebar() {
                     key={item.href}
                     href={item.href}
                     className={`${styles.menuItem} ${isActive ? styles.active : ''}`}
+                    title={item.label}
                   >
                     <Icon />
                     <span>{item.label}</span>
@@ -76,38 +63,6 @@ export function Sidebar() {
                 )
               })}
             </div>
-
-            {user && (
-              <div className={styles.section}>
-                <div className={styles.sectionTitle}>Вы</div>
-                {userMenuItems.map((item) => {
-                  const Icon = item.icon
-                  const isActive = pathname === item.href
-                  return (
-                    <Link
-                      key={item.href}
-                      href={item.href}
-                      className={`${styles.menuItem} ${isActive ? styles.active : ''}`}
-                    >
-                      <Icon />
-                      <span>{item.label}</span>
-                    </Link>
-                  )
-                })}
-                {(user.role === 'admin' || 
-                  user.role === 'own' || 
-                  (user.role && user.role.startsWith('admin'))) && (
-                  <Link
-                    href="/admin"
-                    className={`${styles.menuItem} ${pathname === '/admin' ? styles.active : ''}`}
-                  >
-                    <FiShield />
-                    <span>Админ панель</span>
-                  </Link>
-                )}
-              </div>
-            )}
-
 
             <div className={styles.section}>
               {settingsItems.map((item) => {
@@ -118,6 +73,7 @@ export function Sidebar() {
                     key={item.href}
                     href={item.href}
                     className={`${styles.menuItem} ${isActive ? styles.active : ''}`}
+                    title={item.label}
                   >
                     <Icon />
                     <span>{item.label}</span>

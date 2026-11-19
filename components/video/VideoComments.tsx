@@ -6,7 +6,7 @@ import { db } from '@/lib/db'
 import { useStore } from '@/lib/store'
 import { formatDistanceToNow } from 'date-fns'
 import { ru } from 'date-fns/locale'
-import { FiThumbsUp, FiThumbsDown, FiHeart, FiPin, FiTrash2 } from 'react-icons/fi'
+import { FiThumbsUp, FiThumbsDown, FiHeart, FiMapPin, FiTrash2 } from 'react-icons/fi'
 import styles from './VideoComments.module.scss'
 import toast from 'react-hot-toast'
 
@@ -69,6 +69,11 @@ export function VideoComments({ videoId, onSeek }: VideoCommentsProps) {
   const [replyText, setReplyText] = useState('')
   const [video, setVideo] = useState<Video | null>(null)
 
+  const resolveAuthor = (authorId: string, fallback: Comment['user']) => {
+    if (user?.id === authorId && user.avatar) return user
+    return db.users.findById(authorId) || fallback
+  }
+
   useEffect(() => {
     const videoData = db.videos.findById(videoId)
     setVideo(videoData || null)
@@ -76,13 +81,13 @@ export function VideoComments({ videoId, onSeek }: VideoCommentsProps) {
     const videoComments = db.comments.findByVideoId(videoId)
     // Mark author replies and sort: pinned first
     const commentsWithAuthorMark = videoComments.map(comment => {
-      const isAuthor = videoData && comment.userId === videoData.userId
+      const isAuthor = Boolean(videoData && comment.userId === videoData.userId)
       return {
         ...comment,
         isAuthorReply: isAuthor || comment.isAuthorReply,
         replies: comment.replies?.map(reply => ({
           ...reply,
-          isAuthorReply: videoData && reply.userId === videoData.userId,
+          isAuthorReply: Boolean(videoData && reply.userId === videoData.userId),
         })),
       }
     })
@@ -118,7 +123,7 @@ export function VideoComments({ videoId, onSeek }: VideoCommentsProps) {
     })
 
     // Mark as author reply if user is video author
-    const isAuthor = video && user.id === video.userId
+    const isAuthor = Boolean(video && user.id === video.userId)
     const commentWithAuthor = {
       ...comment,
       isAuthorReply: isAuthor,
@@ -191,13 +196,13 @@ export function VideoComments({ videoId, onSeek }: VideoCommentsProps) {
     // Update comments
     const updatedComments = db.comments.findByVideoId(videoId)
     const commentsWithAuthorMark = updatedComments.map(comment => {
-      const isAuthor = video && comment.userId === video.userId
+      const isAuthor = Boolean(video && comment.userId === video.userId)
       return {
         ...comment,
         isAuthorReply: isAuthor || comment.isAuthorReply,
         replies: comment.replies?.map(reply => ({
           ...reply,
-          isAuthorReply: video && reply.userId === video.userId,
+          isAuthorReply: Boolean(video && reply.userId === video.userId),
         })),
       }
     })
@@ -223,13 +228,13 @@ export function VideoComments({ videoId, onSeek }: VideoCommentsProps) {
       // Update comments
       const updatedComments = db.comments.findByVideoId(videoId)
       const commentsWithAuthorMark = updatedComments.map(c => {
-        const isAuthor = video && c.userId === video.userId
+        const isAuthor = Boolean(video && c.userId === video.userId)
         return {
           ...c,
           isAuthorReply: isAuthor || c.isAuthorReply,
           replies: c.replies?.map(reply => ({
             ...reply,
-            isAuthorReply: video && reply.userId === video.userId,
+            isAuthorReply: Boolean(video && reply.userId === video.userId),
           })),
         }
       })
@@ -270,13 +275,13 @@ export function VideoComments({ videoId, onSeek }: VideoCommentsProps) {
       // Update comments
       const updatedComments = db.comments.findByVideoId(videoId)
       const commentsWithAuthorMark = updatedComments.map(c => {
-        const isAuthor = video && c.userId === video.userId
+        const isAuthor = Boolean(video && c.userId === video.userId)
         return {
           ...c,
           isAuthorReply: isAuthor || c.isAuthorReply,
           replies: c.replies?.map(reply => ({
             ...reply,
-            isAuthorReply: video && reply.userId === video.userId,
+            isAuthorReply: Boolean(video && reply.userId === video.userId),
           })),
         }
       })
@@ -310,10 +315,6 @@ export function VideoComments({ videoId, onSeek }: VideoCommentsProps) {
       return
     }
 
-    if (!confirm('Вы уверены, что хотите удалить этот комментарий?')) {
-      return
-    }
-
     // Delete comment and its replies
     const success = db.comments.delete(commentId)
     
@@ -328,13 +329,13 @@ export function VideoComments({ videoId, onSeek }: VideoCommentsProps) {
       // Update comments
       const updatedComments = db.comments.findByVideoId(videoId)
       const commentsWithAuthorMark = updatedComments.map(c => {
-        const isAuthor = video && c.userId === video.userId
+        const isAuthor = Boolean(video && c.userId === video.userId)
         return {
           ...c,
           isAuthorReply: isAuthor || c.isAuthorReply,
           replies: c.replies?.map(reply => ({
             ...reply,
-            isAuthorReply: video && reply.userId === video.userId,
+            isAuthorReply: Boolean(video && reply.userId === video.userId),
           })),
         }
       })
@@ -389,23 +390,25 @@ export function VideoComments({ videoId, onSeek }: VideoCommentsProps) {
       )}
 
       <div className={styles.commentsList}>
-        {comments.map((comment) => (
+        {comments.map((comment) => {
+          const commentAuthor = resolveAuthor(comment.userId, comment.user)
+          return (
           <div key={comment.id} className={styles.comment}>
             <div className={styles.commentHeader}>
-              {comment.user.avatar ? (
-                <img src={comment.user.avatar} alt={comment.user.username} className={styles.avatar} />
+              {commentAuthor.avatar ? (
+                <img src={commentAuthor.avatar} alt={commentAuthor.username} className={styles.avatar} />
               ) : (
                 <div className={styles.avatarPlaceholder}>
-                  {comment.user.username.charAt(0).toUpperCase()}
+                  {commentAuthor.username.charAt(0).toUpperCase()}
                 </div>
               )}
               <div className={styles.commentContent}>
                 <div className={styles.commentAuthor}>
                   <span className={styles.authorName}>
                     {comment.isPinned && (
-                      <FiPin className={styles.pinnedIcon} title="Закреплен" />
+                      <FiMapPin className={styles.pinnedIcon} title="Закреплен" />
                     )}
-                    {comment.user.username}
+                    {commentAuthor.username}
                     {comment.isAuthorReply && (
                       <span className={styles.authorBadge} title="Автор видео">
                         АВТОР
@@ -456,7 +459,7 @@ export function VideoComments({ videoId, onSeek }: VideoCommentsProps) {
                         onClick={() => handlePinComment(comment.id)}
                         title={comment.isPinned ? "Открепить" : "Закрепить"}
                       >
-                        <FiPin />
+                        <FiMapPin />
                         <span>{comment.isPinned ? 'Открепить' : 'Закрепить'}</span>
                       </button>
                     </>
@@ -501,19 +504,21 @@ export function VideoComments({ videoId, onSeek }: VideoCommentsProps) {
 
                 {comment.replies && comment.replies.length > 0 && (
                   <div className={styles.replies}>
-                    {comment.replies.map((reply) => (
+                    {comment.replies.map((reply) => {
+                      const replyAuthor = resolveAuthor(reply.userId, reply.user)
+                      return (
                       <div key={reply.id} className={styles.reply}>
-                        {reply.user.avatar ? (
-                          <img src={reply.user.avatar} alt={reply.user.username} className={styles.avatar} />
+                        {replyAuthor.avatar ? (
+                          <img src={replyAuthor.avatar} alt={replyAuthor.username} className={styles.avatar} />
                         ) : (
                           <div className={styles.avatarPlaceholder}>
-                            {reply.user.username.charAt(0).toUpperCase()}
+                            {replyAuthor.username.charAt(0).toUpperCase()}
                           </div>
                         )}
                         <div className={styles.commentContent}>
                           <div className={styles.commentAuthor}>
                             <span className={styles.authorName}>
-                              {reply.user.username}
+                              {replyAuthor.username}
                               {reply.isAuthorReply && (
                                 <span className={styles.authorBadge} title="Автор видео">
                                   АВТОР
@@ -572,13 +577,15 @@ export function VideoComments({ videoId, onSeek }: VideoCommentsProps) {
                           </div>
                         </div>
                       </div>
-                    ))}
+                      )
+                    })}
                   </div>
                 )}
               </div>
             </div>
           </div>
-        ))}
+          )
+        })}
       </div>
     </div>
   )

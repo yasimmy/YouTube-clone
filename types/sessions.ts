@@ -16,6 +16,7 @@ export interface ActiveSession {
   sessionToken: string
   createdAt: string
   lastActivity: string
+  expiresAt?: string
   ip?: string
   userAgent?: string
   device?: string

@@ -1,69 +1,30 @@
-// File persistence utilities - save avatars, banners, thumbnails to localStorage as base64
+// User media is stored by the server. Only the returned URL is kept in the client database.
 
-export function saveImageToStorage(key: string, file: File): Promise<string> {
-  return new Promise((resolve, reject) => {
-    if (typeof window === 'undefined') {
-      reject(new Error('Not in browser'))
-      return
-    }
+export async function uploadFile(file: File, kind: 'image' | 'video'): Promise<string> {
+  if (typeof window === 'undefined') throw new Error('Not in browser')
 
-    const reader = new FileReader()
-    reader.onload = () => {
-      const base64 = reader.result as string
-      try {
-        localStorage.setItem(key, base64)
-        resolve(base64)
-      } catch (e) {
-        reject(e)
-      }
-    }
-    reader.onerror = reject
-    reader.readAsDataURL(file)
-  })
+  const body = new FormData()
+  body.append('file', file)
+  body.append('kind', kind)
+
+  const response = await fetch('/api/uploads', { method: 'POST', body })
+  const result = await response.json().catch(() => ({}))
+  if (!response.ok || !result.url) {
+    throw new Error(result.error || 'Не удалось загрузить файл')
+  }
+  return result.url
 }
 
-export function getImageFromStorage(key: string): string | null {
-  if (typeof window === 'undefined') return null
-  return localStorage.getItem(key)
-}
+export function saveAvatar(_userId: string, file: File): Promise<string> { return uploadFile(file, 'image') }
+export function saveBanner(_userId: string, file: File): Promise<string> { return uploadFile(file, 'image') }
+export function saveThumbnail(_videoId: string, file: File): Promise<string> { return uploadFile(file, 'image') }
+export function saveVideo(file: File): Promise<string> { return uploadFile(file, 'video') }
 
-export function saveAvatar(userId: string, file: File): Promise<string> {
-  return saveImageToStorage(`yt2-avatar-${userId}`, file)
-}
-
-export function saveBanner(userId: string, file: File): Promise<string> {
-  return saveImageToStorage(`yt2-banner-${userId}`, file)
-}
-
-export function saveThumbnail(videoId: string, file: File): Promise<string> {
-  return saveImageToStorage(`yt2-thumbnail-${videoId}`, file)
-}
-
-export function getAvatar(userId: string): string | null {
-  return getImageFromStorage(`yt2-avatar-${userId}`)
-}
-
-export function getBanner(userId: string): string | null {
-  return getImageFromStorage(`yt2-banner-${userId}`)
-}
-
-export function getThumbnail(videoId: string): string | null {
-  return getImageFromStorage(`yt2-thumbnail-${videoId}`)
-}
-
-export function deleteAvatar(userId: string): void {
-  if (typeof window === 'undefined') return
-  localStorage.removeItem(`yt2-avatar-${userId}`)
-}
-
-export function deleteBanner(userId: string): void {
-  if (typeof window === 'undefined') return
-  localStorage.removeItem(`yt2-banner-${userId}`)
-}
-
-export function deleteThumbnail(videoId: string): void {
-  if (typeof window === 'undefined') return
-  localStorage.removeItem(`yt2-thumbnail-${videoId}`)
-}
-
-
+// Kept for compatibility with existing code. Media is no longer read from localStorage.
+export function getImageFromStorage(_key: string): string | null { return null }
+export function getAvatar(_userId: string): string | null { return null }
+export function getBanner(_userId: string): string | null { return null }
+export function getThumbnail(_videoId: string): string | null { return null }
+export function deleteAvatar(_userId: string): void {}
+export function deleteBanner(_userId: string): void {}
+export function deleteThumbnail(_videoId: string): void {}

@@ -1,6 +1,7 @@
 'use client'
 
 import { useEffect, useState } from 'react'
+import Link from 'next/link'
 import { VideoCard } from '@/components/video/VideoCard'
 import { useStore } from '@/lib/store'
 import { getRecommendedVideos, getPromotedVideos } from '@/lib/promotion-algorithm'
@@ -32,8 +33,13 @@ export function HomePage() {
   if (videos.length === 0) {
     return (
       <div className={styles.empty}>
-        <h2>Пока нет видео</h2>
-        <p>Будьте первым, кто загрузит видео!</p>
+        <div className={styles.emptyCard}>
+          <div className={styles.waveMark} aria-hidden="true">∿</div>
+          <span className={styles.emptyEyebrow}>WAVE / HOME</span>
+          <h2>Пока нет видео</h2>
+          <p>Будьте первым, кто загрузит видео и запустит волну.</p>
+          <Link href="/upload" className={styles.emptyAction}>Загрузить видео</Link>
+        </div>
       </div>
     )
   }

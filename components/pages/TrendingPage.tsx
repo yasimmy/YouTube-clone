@@ -30,7 +30,9 @@ export function TrendingPage() {
       <h1 className={styles.title}>В тренде</h1>
       {videos.length === 0 ? (
         <div className={styles.empty}>
+          <div className={styles.emptyMark}>✦</div>
           <p>Пока нет популярных видео</p>
+          <span>Тренды появятся, как только начнётся новая волна.</span>
         </div>
       ) : (
         <div className={styles.videoGrid}>

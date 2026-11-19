@@ -11,7 +11,7 @@ import {
   FiAward,
   FiCheck,
   FiX,
-  FiCoins,
+  FiDollarSign,
 } from 'react-icons/fi'
 import { AvatarFrame, UserBadge } from '@/types'
 import toast from 'react-hot-toast'
@@ -227,16 +227,6 @@ export function ShopPage() {
     ? shopItemsData
     : shopItemsData.filter(item => item.type === selectedCategory)
 
-  const getRarityColor = (rarity: string) => {
-    switch (rarity) {
-      case 'common': return '#9ca3af'
-      case 'rare': return '#3b82f6'
-      case 'epic': return '#a855f7'
-      case 'legendary': return '#f59e0b'
-      default: return '#9ca3af'
-    }
-  }
-
   const isOwned = (item: ShopItem) => {
     if (!user) return false
     if (item.type === 'nickname-effect') return user.nicknameHighlight === item.value
@@ -263,7 +253,7 @@ export function ShopPage() {
         <div className={styles.headerTop}>
           <h1>Магазин</h1>
           <div className={styles.currencyDisplay}>
-            <FiCoins />
+            <FiDollarSign />
             <span>{currency.toLocaleString()}</span>
           </div>
         </div>
@@ -308,18 +298,34 @@ export function ShopPage() {
             <div
               key={item.id}
               className={`${styles.itemCard} ${owned ? styles.owned : ''} ${item.isNew ? styles.newItem : ''}`}
-              style={{ borderColor: getRarityColor(item.rarity) }}
+              data-rarity={item.rarity}
             >
               {item.isNew && <div className={styles.newBadge}>Новинка</div>}
               {item.discount && <div className={styles.discountBadge}>-{item.discount}%</div>}
               
               <div className={styles.itemHeader}>
-                <div className={styles.itemIcon} style={{ color: getRarityColor(item.rarity) }}>
+                <div className={styles.itemIcon}>
                   {IconComponent && React.createElement(IconComponent, {})}
                 </div>
-                <span className={styles.rarity} style={{ color: getRarityColor(item.rarity) }}>
+                <span className={styles.rarity}>
                   {item.rarity}
                 </span>
+              </div>
+
+              <div className={styles.itemPreview} aria-label={`Предпросмотр: ${item.name}`}>
+                {item.type === 'nickname-effect' && (
+                  <span className={`${styles.previewNickname} ${styles[`preview-${item.value.toLowerCase().replace(' ', '-')}`]}`}>wave</span>
+                )}
+                {item.type === 'avatar-frame' && (
+                  <div className={`${styles.previewAvatar} ${styles[`frame-${item.value}`]}`}>
+                    <span>w</span>
+                  </div>
+                )}
+                {item.type === 'badge' && (
+                  <div className={styles.previewBadgeIcon}>
+                    {IconComponent && React.createElement(IconComponent, {})}
+                  </div>
+                )}
               </div>
 
               <div className={styles.itemContent}>
@@ -332,7 +338,7 @@ export function ShopPage() {
                   {item.discount && (
                     <span className={styles.oldPrice}>{item.price.toLocaleString()}</span>
                   )}
-                  <FiCoins />
+                  <FiDollarSign />
                   <span>{finalPrice.toLocaleString()}</span>
                 </div>
                 {owned ? (

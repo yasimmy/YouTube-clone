@@ -8,7 +8,7 @@ import { loadDatabaseFromStorage, saveDatabaseToStorage } from './db-persist'
 
 // Load from localStorage on initialization (only on client side)
 // This needs to be done lazily to avoid SSR issues
-let initialData: {
+interface DatabaseState {
   users: User[]
   videos: Video[]
   comments: Comment[]
@@ -19,10 +19,12 @@ let initialData: {
       reports: Report[]
       loginHistory: LoginHistory[]
       activeSessions: ActiveSession[]
-} | null = null
+}
+
+let initialData: DatabaseState | null = null
 
 // Initialize on first access (client-side only)
-const getInitialData = () => {
+const getInitialData = (): DatabaseState => {
   if (initialData === null) {
     initialData = {
       users: [],
@@ -33,12 +35,25 @@ const getInitialData = () => {
       watchHistory: [],
       likes: [],
       reports: [],
+      loginHistory: [],
+      activeSessions: [],
     }
     
     if (typeof window !== 'undefined') {
       const saved = loadDatabaseFromStorage()
       if (saved) {
-        initialData = saved
+        initialData = {
+          users: saved.users || [],
+          videos: saved.videos || [],
+          comments: saved.comments || [],
+          playlists: saved.playlists || [],
+          subscriptions: saved.subscriptions || [],
+          watchHistory: saved.watchHistory || [],
+          likes: saved.likes || [],
+          reports: saved.reports || [],
+          loginHistory: saved.loginHistory || [],
+          activeSessions: saved.activeSessions || [],
+        }
       }
     }
   }
@@ -57,12 +72,26 @@ let reports: Report[] = []
 let loginHistory: LoginHistory[] = []
 let activeSessions: ActiveSession[] = []
 
+const normalizeUsername = (username: string): string => {
+  const value = String(username || '').trim()
+  const withoutDatabaseZero = value.replace(/\.0$/, '')
+  return withoutDatabaseZero || value
+}
+
+const normalizeUser = (user: User): User => {
+  const username = normalizeUsername(user.username)
+  if (user.email === 'admin@yt2.com' && (username === 'admin0' || username === 'admin')) {
+    return { ...user, username: 'admin' }
+  }
+  return { ...user, username }
+}
+
 // Initialize from localStorage on first access
 let initialized = false
 const initializeDB = () => {
   if (!initialized && typeof window !== 'undefined') {
     const data = getInitialData()
-    users = data.users || []
+    users = (data.users || []).map(normalizeUser)
     videos = data.videos || []
     comments = data.comments || []
     playlists = data.playlists || []
@@ -106,7 +135,7 @@ const persist = () => {
 // Users
 export const db = {
   users: {
-    create: (user: Omit<User, 'id' | 'createdAt' | 'subscribersCount' | 'emailVerified'>) => {
+    create: (user: Omit<User, 'id' | 'createdAt' | 'subscribersCount'>) => {
       // Ensure DB is initialized
       if (typeof window !== 'undefined' && !initialized) {
         initializeDB()
@@ -114,10 +143,12 @@ export const db = {
       
       const newUser: User = {
         ...user,
+        username: normalizeUsername(user.username),
         id: Date.now().toString(),
         createdAt: new Date().toISOString(),
         subscribersCount: 0,
-        emailVerified: false,
+        emailVerified: user.emailVerified ?? false,
+        updatedAt: new Date().toISOString(),
         role: user.role || 'user',
       }
       users.push(newUser)
@@ -163,7 +194,7 @@ export const db = {
     update: (id: string, data: Partial<User>) => {
       const index = users.findIndex((u) => u.id === id)
       if (index !== -1) {
-        users[index] = { ...users[index], ...data }
+        users[index] = normalizeUser({ ...users[index], ...data, username: data.username === undefined ? users[index].username : normalizeUsername(data.username) })
         persist()
         return users[index]
       }
@@ -177,7 +208,7 @@ export const db = {
         } else {
           // Reload from storage to get latest data
           const data = getInitialData()
-          users = data.users || []
+          users = (data.users || []).map(normalizeUser)
         }
       }
       return users

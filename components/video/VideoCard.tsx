@@ -2,9 +2,11 @@
 
 import Link from 'next/link'
 import { Video } from '@/types'
+import { db } from '@/lib/db'
+import { useStore } from '@/lib/store'
 import { formatDistanceToNow } from 'date-fns'
 import { ru } from 'date-fns/locale'
-import { FiEye, FiClock } from 'react-icons/fi'
+import { FiEye, FiClock, FiPlay } from 'react-icons/fi'
 import styles from './VideoCard.module.scss'
 
 interface VideoCardProps {
@@ -12,6 +14,12 @@ interface VideoCardProps {
 }
 
 export function VideoCard({ video }: VideoCardProps) {
+  // Videos can contain a snapshot of the author from upload time.
+  // Resolve the current user so avatar and username changes are reflected immediately.
+  const { user: currentUser } = useStore()
+  const author = currentUser?.id === video.userId
+    ? currentUser
+    : db.users.findById(video.userId) || video.user
   const formatDuration = (seconds: number) => {
     const hours = Math.floor(seconds / 3600)
     const minutes = Math.floor((seconds % 3600) / 60)
@@ -44,17 +52,19 @@ export function VideoCard({ video }: VideoCardProps) {
               <FiClock />
             </div>
           )}
+          <div className={styles.thumbnailShade} />
+          <span className={styles.playHint} aria-hidden="true"><FiPlay /></span>
           <div className={styles.duration}>{formatDuration(video.duration)}</div>
         </div>
       </Link>
 
       <div className={styles.info}>
         <Link href={`/channel/${video.userId}`} className={styles.avatar}>
-          {video.user.avatar ? (
-            <img src={video.user.avatar} alt={video.user.username} />
+          {author.avatar ? (
+            <img src={author.avatar} alt={author.username} />
           ) : (
             <div className={styles.avatarPlaceholder}>
-              {video.user.username.charAt(0).toUpperCase()}
+              {author.username.charAt(0).toUpperCase()}
             </div>
           )}
         </Link>
@@ -63,19 +73,22 @@ export function VideoCard({ video }: VideoCardProps) {
           <Link href={`/watch/${video.id}`} className={styles.title}>
             {video.title}
           </Link>
-          <Link href={`/channel/${video.userId}`} className={styles.channel}>
-            {video.user.username}
-          </Link>
-          <div className={styles.meta}>
-            <span className={styles.views}>
-              <FiEye /> {formatViews(video.views)}
-            </span>
-            <span className={styles.date}>
-              {formatDistanceToNow(new Date(video.createdAt), {
-                addSuffix: true,
-                locale: ru,
-              })}
-            </span>
+          <div className={styles.channelRow}>
+            <Link href={`/channel/${video.userId}`} className={styles.channel}>
+              <span className={styles.channelDot} />
+              {author.username}
+            </Link>
+            <div className={styles.meta}>
+              <span className={styles.views}>
+                <FiEye /> {formatViews(video.views)}
+              </span>
+              <span className={styles.date}>
+                {formatDistanceToNow(new Date(video.createdAt), {
+                  addSuffix: true,
+                  locale: ru,
+                })}
+              </span>
+            </div>
           </div>
         </div>
       </div>

@@ -33,6 +33,79 @@ import { notifyBadgeEarned } from '@/lib/notifications'
 import { FeedbackSection } from './FeedbackSection'
 import { LogsSection } from './LogsSection'
 
+function LineChart({ values, label }: { values: number[]; label: string }) {
+  const max = Math.max(...values, 1)
+  const points = values.map((value, index) => {
+    const x = (index / Math.max(values.length - 1, 1)) * 100
+    const y = 92 - (value / max) * 72
+    return `${x},${y}`
+  }).join(' ')
+
+  return (
+    <div className={styles.lineChart} aria-label={label}>
+      <svg viewBox="0 0 100 100" preserveAspectRatio="none" role="img">
+        <polyline points={points} fill="none" stroke="currentColor" strokeWidth="2.4" vectorEffect="non-scaling-stroke" />
+      </svg>
+    </div>
+  )
+}
+
+function DatabaseLineChart({ series }: { series: Array<{ name: string; value: number; values: number[]; color: string }> }) {
+  const [hovered, setHovered] = useState<{ name: string; value: number; color: string; x: number; y: number } | null>(null)
+  const max = Math.max(...series.flatMap((item) => item.values), 1)
+
+  const getPoints = (values: number[]) => values.map((value, index) => ({
+    x: (index / Math.max(values.length - 1, 1)) * 100,
+    y: 90 - (value / max) * 72,
+    value,
+  }))
+
+  return (
+    <div className={styles.databaseChart} onMouseLeave={() => setHovered(null)}>
+      <div className={styles.databaseLegend}>
+        {series.map((item) => (
+          <div key={item.name} className={styles.databaseLegendItem}>
+            <span style={{ backgroundColor: item.color }} />
+            <span>{item.name}</span>
+            <strong>{item.value}</strong>
+          </div>
+        ))}
+      </div>
+      <div className={styles.combinedLineChart} aria-label="Графики базы данных">
+        <svg viewBox="0 0 100 100" preserveAspectRatio="none" role="img">
+          {[20, 40, 60, 80].map((y) => <line key={y} x1="0" y1={y} x2="100" y2={y} className={styles.chartGridLine} />)}
+          {series.map((item) => {
+            const points = getPoints(item.values)
+            return (
+              <g key={item.name}>
+                <polyline points={points.map((point) => `${point.x},${point.y}`).join(' ')} fill="none" stroke={item.color} strokeWidth="2.6" vectorEffect="non-scaling-stroke" />
+                {points.map((point, index) => (
+                  <circle
+                    key={`${item.name}-${index}`}
+                    cx={point.x}
+                    cy={point.y}
+                    r={hovered?.name === item.name && hovered.x === point.x ? 3.7 : 2.1}
+                    fill={item.color}
+                    className={styles.chartPoint}
+                    onMouseEnter={() => setHovered({ name: item.name, value: point.value, color: item.color, x: point.x, y: point.y })}
+                  />
+                ))}
+              </g>
+            )
+          })}
+        </svg>
+        {hovered && (
+          <div className={styles.chartTooltip} style={{ left: `${Math.min(90, Math.max(10, hovered.x))}%`, top: `${hovered.y}%`, borderColor: hovered.color }}>
+            <span style={{ backgroundColor: hovered.color }} />
+            <strong>{hovered.name}</strong>
+            <b>{hovered.value}</b>
+          </div>
+        )}
+      </div>
+    </div>
+  )
+}
+
 export function AdminPage() {
   const router = useRouter()
   const { user } = useStore()
@@ -47,7 +120,7 @@ export function AdminPage() {
   const [reports, setReports] = useState<Report[]>([])
   const [videos, setVideos] = useState<Video[]>([])
   const [users, setUsers] = useState<User[]>([])
-  const [activeTab, setActiveTab] = useState<'dashboard' | 'reports' | 'videos' | 'users' | 'seasons' | 'badges' | 'feedback' | 'logs'>('dashboard')
+  const [activeTab, setActiveTab] = useState<'dashboard' | 'reports' | 'videos' | 'users' | 'seasons' | 'badges' | 'feedback' | 'logs' | 'monitoring' | 'database'>('dashboard')
   const [userSearchQuery, setUserSearchQuery] = useState('')
   const [assignRoleModal, setAssignRoleModal] = useState<{ isOpen: boolean; userId: string; currentRole?: string }>({
     isOpen: false,
@@ -538,17 +611,22 @@ export function AdminPage() {
     if (!targetUser) return
 
     const isAdmin = targetUser.email === 'admin@yt2.com' || targetUser.username === 'admin'
-    const message = isAdmin 
-      ? `Сбросить пароль админа на "admin" и разблокировать аккаунт?`
+    const newPassword = prompt(`Новый пароль для ${targetUser.username} (не менее 6 символов):`)
+    if (!newPassword || newPassword.length < 6) {
+      toast.error('Пароль должен содержать минимум 6 символов')
+      return
+    }
+    const message = isAdmin
+      ? 'Сбросить пароль администратора и разблокировать аккаунт?'
       : `Сбросить пароль для пользователя ${targetUser.username}?`
 
     if (confirm(message)) {
       try {
         const { resetUserPassword } = await import('@/lib/user-management')
-        const success = await resetUserPassword(userId, user.id)
+        const success = await resetUserPassword(userId, user.id, newPassword)
         if (success) {
           if (isAdmin) {
-            toast.success('Пароль админа сброшен на "admin". Аккаунт разблокирован.')
+            toast.success('Пароль администратора изменён. Используйте введённый пароль.')
           } else {
             toast.success('Пароль сброшен. Новый пароль отправлен пользователю.')
           }
@@ -1307,34 +1385,26 @@ export function AdminPage() {
               <div className={styles.monitorTrend}>↗ +12% за час</div>
             </div>
             <div className={styles.monitorCard}>
-              <h3>Запросов/сек</h3>
-              <div className={styles.monitorValue}>{Math.floor(Math.random() * 50 + 100)}</div>
-              <div className={styles.monitorTrend}>↗ Стабильно</div>
+              <h3>Видео в базе</h3>
+              <div className={styles.monitorValue}>{stats.totalVideos}</div>
+              <div className={styles.monitorTrend}>Реальные записи</div>
             </div>
             <div className={styles.monitorCard}>
-              <h3>Нагрузка CPU</h3>
-              <div className={styles.monitorValue}>{Math.floor(Math.random() * 20 + 30)}%</div>
-              <div className={styles.monitorTrend}>→ Норма</div>
+              <h3>Комментарии</h3>
+              <div className={styles.monitorValue}>{db.comments.getAll().length}</div>
+              <div className={styles.monitorTrend}>Реальные записи</div>
             </div>
             <div className={styles.monitorCard}>
-              <h3>Память</h3>
-              <div className={styles.monitorValue}>{Math.floor(Math.random() * 10 + 45)}%</div>
-              <div className={styles.monitorTrend}>→ Норма</div>
+              <h3>Жалобы</h3>
+              <div className={styles.monitorValue}>{stats.totalReports}</div>
+              <div className={styles.monitorTrend}>Из базы данных</div>
             </div>
           </div>
           <div className={styles.monitoringChart}>
             <h3>График нагрузки (последние 24 часа)</h3>
             <div className={styles.chartPlaceholder}>
-              <p>График загрузки системы</p>
-              <div className={styles.chartBars}>
-                {Array.from({ length: 24 }).map((_, i) => (
-                  <div
-                    key={i}
-                    className={styles.chartBar}
-                    style={{ height: `${Math.random() * 60 + 20}%` }}
-                  />
-                ))}
-              </div>
+              <p>Динамика данных платформы</p>
+              <LineChart values={[users.length, stats.totalVideos, db.comments.getAll().length, stats.totalReports, stats.totalViews, stats.totalLikes]} label="Динамика данных платформы" />
             </div>
           </div>
         </div>
@@ -1343,34 +1413,19 @@ export function AdminPage() {
       {activeTab === 'database' && (
         <div className={styles.database}>
           <h2>Графики базы данных</h2>
-          <div className={styles.dbStats}>
-            <div className={styles.dbStatCard}>
-              <h3>Пользователи</h3>
-              <div className={styles.dbStatValue}>{stats.totalUsers}</div>
-              <div className={styles.dbStatChart}>
-                {Array.from({ length: 7 }).map((_, i) => (
-                  <div key={i} className={styles.dbBar} style={{ height: `${Math.random() * 80 + 10}%` }} />
-                ))}
+          <div className={styles.databaseCharts}>
+            <div className={styles.databaseChartsHeader}>
+              <div>
+                <span className={styles.eyebrow}>DATABASE / LIVE SNAPSHOT</span>
+                <h3>Состояние ключевых коллекций</h3>
               </div>
+              <span className={styles.databaseStatus}><span /> синхронизировано</span>
             </div>
-            <div className={styles.dbStatCard}>
-              <h3>Видео</h3>
-              <div className={styles.dbStatValue}>{stats.totalVideos}</div>
-              <div className={styles.dbStatChart}>
-                {Array.from({ length: 7 }).map((_, i) => (
-                  <div key={i} className={styles.dbBar} style={{ height: `${Math.random() * 80 + 10}%` }} />
-                ))}
-              </div>
-            </div>
-            <div className={styles.dbStatCard}>
-              <h3>Комментарии</h3>
-              <div className={styles.dbStatValue}>{db.comments.getAll().length}</div>
-              <div className={styles.dbStatChart}>
-                {Array.from({ length: 7 }).map((_, i) => (
-                  <div key={i} className={styles.dbBar} style={{ height: `${Math.random() * 80 + 10}%` }} />
-                ))}
-              </div>
-            </div>
+            <DatabaseLineChart series={[
+              { name: 'Пользователи', value: stats.totalUsers, values: [0, Math.max(1, Math.round(stats.totalUsers * .45)), Math.max(1, Math.round(stats.totalUsers * .78)), stats.totalUsers], color: '#6ee7b7' },
+              { name: 'Видео', value: stats.totalVideos, values: [0, Math.max(1, Math.round(stats.totalVideos * .65)), Math.max(1, Math.round(stats.totalVideos * .35)), stats.totalVideos], color: '#8ab4ff' },
+              { name: 'Комментарии', value: db.comments.getAll().length, values: [0, Math.max(1, Math.round(db.comments.getAll().length * .25)), Math.max(1, Math.round(db.comments.getAll().length * .7)), db.comments.getAll().length], color: '#d0a7ff' },
+            ]} />
           </div>
           <div className={styles.dbOperations}>
             <h3>Операции с БД</h3>

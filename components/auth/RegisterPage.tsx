@@ -11,6 +11,7 @@ import { db } from '@/lib/db'
 import toast from 'react-hot-toast'
 import styles from './Auth.module.scss'
 import { motion } from 'framer-motion'
+import { hashPassword } from '@/lib/auth'
 
 const registerSchema = z
   .object({
@@ -60,6 +61,7 @@ export function RegisterPage() {
       const user = db.users.create({
         email: data.email,
         username: data.username,
+        passwordHash: hashPassword(data.password),
         emailVerified: false, // In production, send verification email
       })
 
@@ -82,7 +84,7 @@ export function RegisterPage() {
         transition={{ duration: 0.3 }}
       >
         <div className={styles.header}>
-          <h1>Регистрация в Yt 2.0</h1>
+          <h1>Регистрация в wave</h1>
           <p>Создайте аккаунт, чтобы начать</p>
         </div>
 

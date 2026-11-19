@@ -22,6 +22,7 @@ import styles from './Header.module.scss'
 import toast from 'react-hot-toast'
 import { deleteCookie } from '@/lib/cookies'
 import { Notifications } from './Notifications'
+import { UserAvatar } from '@/components/shared/UserAvatar'
 
 export function Header() {
   const router = useRouter()
@@ -115,12 +116,12 @@ export function Header() {
         <Link href="/" className={styles.logo}>
           <img 
             src="/logo-icon.svg" 
-            alt="YouTube" 
+            alt="Wave"
             className={styles.logoImage}
             width={32}
             height={32}
           />
-          <span className={styles.logoText}>YouTube</span>
+          <span className={styles.logoText}>wave</span>
         </Link>
       </div>
 
@@ -180,13 +181,7 @@ export function Header() {
                 <div className={styles.userMenu}>
                     <div className={styles.userMenuHeader}>
                       <div className={styles.userMenuAvatar}>
-                        {user.avatar ? (
-                          <img src={user.avatar} alt={user.username} />
-                        ) : (
-                          <div className={styles.avatarPlaceholder}>
-                            {user.username.charAt(0).toUpperCase()}
-                          </div>
-                        )}
+                        <UserAvatar user={user} size={44} showBadges={false} showFrame />
                       </div>
                       <div className={styles.userMenuInfo}>
                         <div className={styles.userMenuName}>{user.username}</div>
@@ -246,7 +241,7 @@ export function Header() {
 
                     <div className={styles.userMenuDivider}></div>
 
-                    <button className={styles.userMenuItem} onClick={handleLogout}>
+                    <button className={`${styles.userMenuItem} ${styles.userMenuLogout}`} onClick={handleLogout}>
                       <FiLogOut />
                       <span>Выйти</span>
                     </button>

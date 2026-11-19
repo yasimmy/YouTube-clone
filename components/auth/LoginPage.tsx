@@ -12,6 +12,7 @@ import { setCookie } from '@/lib/cookies'
 import toast from 'react-hot-toast'
 import styles from './Auth.module.scss'
 import { motion } from 'framer-motion'
+import { createSessionToken, verifyPassword } from '@/lib/auth'
 
 const loginSchema = z.object({
   email: z.string().min(1, 'Введите email или логин'),
@@ -44,7 +45,8 @@ export function LoginPage() {
       : 'Unknown'
     
     // Generate session token
-    const sessionToken = `${Date.now()}-${Math.random().toString(36).substr(2, 9)}`
+    const sessionToken = createSessionToken()
+    const expiresAt = new Date(Date.now() + 7 * 24 * 60 * 60 * 1000).toISOString()
     
     // Create session
     db.sessions.create({
@@ -52,6 +54,7 @@ export function LoginPage() {
       sessionToken,
       createdAt: new Date().toISOString(),
       lastActivity: new Date().toISOString(),
+      expiresAt,
       userAgent,
       device,
       isCurrent: true,
@@ -104,7 +107,7 @@ export function LoginPage() {
     try {
       // Verify 2FA code
       const { verifyTOTP } = await import('@/lib/2fa')
-      if (!verifyTOTP(twoFACode, (pendingUser as any).twoFactorSecret)) {
+      if (!(await verifyTOTP(twoFACode, (pendingUser as any).twoFactorSecret))) {
         toast.error('Неверный код двухфакторной аутентификации')
         setTwoFACode('')
         setLoading(false)
@@ -127,67 +130,6 @@ export function LoginPage() {
     try {
       // Simulate API call
       await new Promise((resolve) => setTimeout(resolve, 500))
-
-      // Check for admin login
-      if (data.email === 'admin' && data.password === 'admin') {
-        let admin = db.users.findByEmail('admin@yt2.com') || db.users.findByUsername('admin')
-        if (!admin) {
-          // Create admin if doesn't exist with 'own' role
-          admin = db.users.create({
-            email: 'admin@yt2.com',
-            username: 'admin',
-            role: 'own',
-            emailVerified: true,
-          })
-        } else {
-          // Update role if user exists but doesn't have admin role
-          if (!admin.role || admin.role === 'user') {
-            admin = db.users.update(admin.id, { role: 'own' }) || admin
-          }
-          // Unblock admin if blocked
-          if (admin.isBlocked) {
-            admin = db.users.update(admin.id, { 
-              isBlocked: false, 
-              blockedUntil: undefined 
-            }) || admin
-          }
-        }
-        await completeLogin(admin)
-        return
-      }
-
-      // Check for official channel login
-      if ((data.email === 'officialchannel' || data.email === 'officialchannel@youtube.com') && data.password === 'officialchannel1') {
-        let official = db.users.findByEmail('officialchannel@youtube.com') || db.users.findByUsername('Official Channel')
-        if (!official) {
-          // Create official channel if doesn't exist
-          official = db.users.create({
-            email: 'officialchannel@youtube.com',
-            username: 'Official Channel',
-            password: 'officialchannel1',
-            description: 'Официальный канал платформы YouTube',
-            emailVerified: true,
-            role: 'user',
-            isOfficial: true,
-            avatarFrame: 'official-gold',
-            nicknameHighlight: 'White Sparkles',
-            badges: ['verified', 'staff'],
-          })
-        }
-        setUser(official)
-        setCookie('yt2_session', official.id, 7)
-        
-        // Award daily login currency
-        if (typeof window !== 'undefined') {
-          import('@/lib/currency-rewards').then(({ rewardDailyLogin }) => {
-            rewardDailyLogin(official.id)
-          })
-        }
-        
-        toast.success('Вход выполнен успешно!')
-        router.push('/')
-        return
-      }
 
       // Try to find user by email or username
       let user = db.users.findByEmail(data.email)
@@ -216,7 +158,11 @@ export function LoginPage() {
         user = db.users.findById(user.id) || user
       }
 
-      // In production, verify password with bcrypt
+      if (!verifyPassword(data.password, user.passwordHash)) {
+        db.loginHistory.create({ userId: user.id, timestamp: new Date().toISOString(), userAgent: navigator.userAgent, device: 'Desktop', success: false })
+        toast.error('Неверный логин или пароль')
+        return
+      }
       
       // Check if 2FA is enabled
       if ((user as any).twoFactorEnabled && (user as any).twoFactorSecret) {
@@ -228,7 +174,7 @@ export function LoginPage() {
       }
       
       // Complete login
-      completeLogin(user)
+      await completeLogin(user)
     } catch (error) {
       toast.error('Ошибка входа')
     } finally {
@@ -245,7 +191,7 @@ export function LoginPage() {
         transition={{ duration: 0.3 }}
       >
         <div className={styles.header}>
-          <h1>Вход в Yt 2.0</h1>
+          <h1>Вход в wave</h1>
           <p>Продолжите, чтобы войти в свой аккаунт</p>
         </div>
 

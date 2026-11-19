@@ -6,7 +6,7 @@ import { User, Video } from '@/types'
 import { db } from '@/lib/db'
 import { useStore } from '@/lib/store'
 import { VideoCard } from '@/components/video/VideoCard'
-import { FiUserPlus, FiUserCheck, FiSettings, FiVideo, FiCheck, FiAlertTriangle, FiShield, FiAward } from 'react-icons/fi'
+import { FiUserPlus, FiUserCheck, FiSettings, FiVideo, FiCheck, FiAlertTriangle, FiShield, FiAward, FiUsers } from 'react-icons/fi'
 import { ShareButton } from '@/components/shared/ShareButton'
 import { UserAvatar } from '@/components/shared/UserAvatar'
 import { OfficialChannelWelcome } from '@/components/channel/OfficialChannelWelcome'
@@ -123,6 +123,7 @@ export function ChannelPage({ channelId }: ChannelPageProps) {
   // Ensure channel has all required properties
   const safeChannel = {
     ...channel,
+    username: String(channel.username || '').replace(/\.0$/, '') || channel.username,
     isOfficial: channel.isOfficial || false,
     isBlocked: channel.isBlocked || false,
     warnings: channel.warnings || 0,
@@ -132,22 +133,24 @@ export function ChannelPage({ channelId }: ChannelPageProps) {
   return (
     <div className={`${styles.channelPage} ${styles.fadeIn}`}>
       {safeChannel.isOfficial && <OfficialChannelWelcome />}
-      <div className={`${styles.banner} ${styles.fadeInScale}`}>
-        {safeChannel.banner ? (
-          <img src={safeChannel.banner} alt={safeChannel.username} />
-        ) : (
-          <div className={styles.bannerPlaceholder}>
-            <div className={styles.bannerGradient}></div>
-          </div>
-        )}
-      </div>
+      <section className={`${styles.channelHero} ${styles.fadeInScale}`}>
+        <div className={styles.banner}>
+          {safeChannel.banner ? (
+            <img src={safeChannel.banner} alt={safeChannel.username} />
+          ) : (
+            <div className={styles.bannerPlaceholder}>
+              <div className={styles.bannerGradient}></div>
+            </div>
+          )}
+        </div>
 
       <div className={`${styles.channelInfo} ${styles.slideUp}`}>
-        <div className={styles.avatarSection}>
-          <UserAvatar user={safeChannel} size={120} showBadges showFrame />
+        <div className={styles.avatarSection} data-frame={safeChannel.avatarFrame || 'none'}>
+          <UserAvatar user={safeChannel} size={86} showBadges showFrame />
         </div>
 
         <div className={styles.infoSection}>
+          <span className={styles.channelEyebrow}>WAVE CHANNEL</span>
           <h1 className={`${styles.channelName} ${safeChannel.isOfficial ? styles.official : ''} ${safeChannel.nicknameHighlight === 'White Sparkles' ? styles.sparkles : ''}`}>
             {safeChannel.username}
             {safeChannel.isOfficial && (
@@ -168,8 +171,8 @@ export function ChannelPage({ channelId }: ChannelPageProps) {
             )}
           </h1>
           <div className={styles.stats}>
-            <span className={styles.subscribers}>{formatSubscribers(safeChannel.subscribersCount)}</span>
-            <span className={styles.videosCount}>{videos.length} видео</span>
+            <span className={styles.subscribers}><FiUsers />{formatSubscribers(safeChannel.subscribersCount)}</span>
+            <span className={styles.videosCount}><FiVideo />{videos.length} видео</span>
             {safeChannel.isBlocked && safeChannel.blockedUntil && (
               <div className={styles.blockedNotice}>
                 <div className={styles.blockedIcon}>
@@ -229,14 +232,16 @@ export function ChannelPage({ channelId }: ChannelPageProps) {
           )}
         </div>
       </div>
+      </section>
 
-      <div className={styles.tabs}>
+      <div className={styles.tabs} role="tablist" aria-label="Разделы канала">
         <button 
           className={`${styles.tab} ${activeTab === 'videos' ? styles.active : ''}`}
           onClick={() => setActiveTab('videos')}
         >
           <FiVideo />
           <span>Видео</span>
+          <small>{videos.length}</small>
         </button>
         <button 
           className={`${styles.tab} ${activeTab === 'badges' ? styles.active : ''}`}
@@ -369,7 +374,7 @@ function BadgeCard({ badge }: { badge: UserBadge }) {
   }
 
   const badgeLabels: Record<UserBadge, string> = {
-    staff: 'Сотрудник YT',
+  staff: 'wave. staff',
     verified: 'Верифицированный',
     premium: 'Премиум',
     partner: 'Партнер',
@@ -395,10 +400,10 @@ function BadgeCard({ badge }: { badge: UserBadge }) {
 
   return (
     <div className={styles.badgeCard} data-rarity={rarity}>
-      <div className={styles.rarityBadge} style={{ backgroundColor: rarityColor }}>
+      <div className={styles.rarityBadge}>
         {rarityLabel}
       </div>
-      <div className={`${styles.badgeIcon} ${styles[`badge-${badge}`]}`} style={{ borderColor: rarityColor }}>
+      <div className={`${styles.badgeIcon} ${styles[`badge-${badge}`]}`}>
         {badgeIcon}
       </div>
       <h3>{badgeLabel}</h3>

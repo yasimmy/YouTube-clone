@@ -169,6 +169,8 @@ export function WatchPage({ videoId }: WatchPageProps) {
     }
   }
 
+  const isOwnChannel = Boolean(user && video && user.id === video.userId)
+
   const handleLike = (type: 'like' | 'dislike') => {
     if (!user) {
       toast.error('Войдите, чтобы оценить видео')
@@ -239,6 +241,9 @@ export function WatchPage({ videoId }: WatchPageProps) {
       </div>
     )
   }
+
+  // Video records keep an author snapshot; always render the current profile data.
+  const author = db.users.findById(video.userId) || video.user
 
   return (
     <div className={`${styles.watchPage} ${styles[`season-${season}`]}`} data-season={season}>
@@ -335,27 +340,33 @@ export function WatchPage({ videoId }: WatchPageProps) {
 
           <div className={styles.channelInfo}>
             <Link href={`/channel/${video.userId}`} className={styles.channelAvatar}>
-              {video.user.avatar ? (
-                <img src={video.user.avatar} alt={video.user.username} />
+              {author.avatar ? (
+                <img src={author.avatar} alt={author.username} />
               ) : (
                 <div className={styles.avatarPlaceholder}>
-                  {video.user.username.charAt(0).toUpperCase()}
+                  {author.username.charAt(0).toUpperCase()}
                 </div>
               )}
             </Link>
             <div className={styles.channelDetails}>
               <Link href={`/channel/${video.userId}`} className={styles.channelName}>
-                {video.user.username}
+                {author.username}
               </Link>
               <span className={styles.subscribers}>
-                {formatViews(video.user.subscribersCount)} подписчиков
+                {formatViews(author.subscribersCount)} подписчиков
               </span>
             </div>
             <button
-              className={`${styles.subscribeButton} ${isSubscribed ? styles.subscribed : ''}`}
+              className={`${styles.subscribeButton} ${isSubscribed ? styles.subscribed : ''} ${isOwnChannel ? styles.ownChannel : ''}`}
               onClick={handleSubscribe}
+              disabled={isOwnChannel}
             >
-              {isSubscribed ? (
+              {isOwnChannel ? (
+                <>
+                  <FiUserCheck />
+                  <span>Ваш канал</span>
+                </>
+              ) : isSubscribed ? (
                 <>
                   <FiUserCheck />
                   <span>Подписка оформлена</span>

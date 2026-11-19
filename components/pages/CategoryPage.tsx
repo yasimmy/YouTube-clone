@@ -6,6 +6,10 @@ import { db } from '@/lib/db'
 import { VideoCard } from '@/components/video/VideoCard'
 import styles from './CategoryPage.module.scss'
 
+const categoryLabels: Record<string, string> = {
+  music: 'Музыка', films: 'Фильмы', gaming: 'Игры', news: 'Новости', sports: 'Спорт', education: 'Обучение',
+}
+
 interface CategoryPageProps {
   category: string
 }
@@ -41,10 +45,16 @@ export function CategoryPage({ category }: CategoryPageProps) {
 
   return (
     <div className={styles.categoryPage}>
-      <h1 className={styles.title}>{category}</h1>
+      <div className={styles.pageIntro}>
+        <span className={styles.eyebrow}>WAVE / CATEGORY</span>
+        <h1 className={styles.title}>{categoryLabels[category] || category}</h1>
+        <p>Выберите видео и поймайте свою волну.</p>
+      </div>
       {videos.length === 0 ? (
         <div className={styles.empty}>
+          <div className={styles.emptyMark}>∿</div>
           <p>В этой категории пока нет видео</p>
+          <span>Попробуйте заглянуть сюда позже.</span>
         </div>
       ) : (
         <div className={styles.videoGrid}>

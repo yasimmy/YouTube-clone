@@ -10,6 +10,7 @@ import { db } from '@/lib/db'
 import { AvatarFrame } from '@/types'
 import toast from 'react-hot-toast'
 import { generateSecret, generateQRCodeUrl, verifyTOTP, generateBackupCodes } from '@/lib/2fa'
+import { UserAvatar } from '@/components/shared/UserAvatar'
 import bcrypt from 'bcryptjs'
 import { FiUser, FiImage, FiGlobe, FiSave, FiEdit2, FiTrash2, FiAward, FiChevronDown, FiChevronUp, FiShield, FiLock, FiKey, FiCopy, FiCheck, FiActivity, FiClock, FiX, FiLogOut, FiMonitor, FiSmartphone } from 'react-icons/fi'
 import styles from './SettingsPage.module.scss'
@@ -353,15 +354,12 @@ export function SettingsPage() {
                         title={!canUse ? 'Доступно только для официального канала' : undefined}
                       >
                         <div className={styles.framePreview}>
-                          <div className={`${styles.frameAvatar} ${styles[`frame-${frame}`]}`}>
-                            {avatarPreview ? (
-                              <img src={avatarPreview} alt="Avatar" />
-                            ) : (
-                              <div className={styles.framePlaceholder}>
-                                {user?.username.charAt(0).toUpperCase()}
-                              </div>
-                            )}
-                          </div>
+                          <UserAvatar
+                            user={{ ...user, avatarFrame: frame }}
+                            size={55}
+                            showBadges={false}
+                            showFrame
+                          />
                         </div>
                         <span className={styles.frameName}>
                           {frame === 'none' ? 'Без рамки' : frame.replace(/-/g, ' ')}
@@ -651,7 +649,7 @@ export function SettingsPage() {
                                 setEnabling2FA(true)
                                 try {
                                   // Verify code
-                                  if (verifyTOTP(twoFactorCode, twoFactorSecret)) {
+                                  if (await verifyTOTP(twoFactorCode, twoFactorSecret)) {
                                     const codes = generateBackupCodes()
                                     db.users.update(user!.id, { 
                                       twoFactorEnabled: true,

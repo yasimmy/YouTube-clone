@@ -5,31 +5,39 @@ import { FiInfo } from 'react-icons/fi'
 import styles from './CookieConsent.module.scss'
 
 export function CookieConsent() {
-  const [show, setShow] = useState(false)
+  const [isVisible, setIsVisible] = useState(false)
+  const [isClosing, setIsClosing] = useState(false)
 
   useEffect(() => {
     // Check if user has already consented
     const consent = localStorage.getItem('cookie-consent')
     if (!consent) {
-      setShow(true)
+      setIsVisible(true)
     }
   }, [])
+
+  const dismiss = () => {
+    setIsClosing(true)
+    window.setTimeout(() => {
+      setIsVisible(false)
+    }, 320)
+  }
 
   const handleAccept = () => {
     localStorage.setItem('cookie-consent', 'accepted')
     localStorage.setItem('cookie-consent-date', new Date().toISOString())
-    setShow(false)
+    dismiss()
   }
 
   const handleDecline = () => {
     localStorage.setItem('cookie-consent', 'declined')
-    setShow(false)
+    dismiss()
   }
 
-  if (!show) return null
+  if (!isVisible) return null
 
   return (
-    <div className={styles.cookieConsent}>
+    <div className={`${styles.cookieConsent} ${isClosing ? styles.closing : ''}`}>
       <div className={styles.content}>
         <div className={styles.icon}>
           <FiInfo />

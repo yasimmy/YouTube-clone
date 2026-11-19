@@ -3,14 +3,13 @@
 import { useEffect } from 'react'
 import { useStore } from '@/lib/store'
 import { db } from '@/lib/db'
-import { getCookie, setCookie } from '@/lib/cookies'
+import { getCookie, deleteCookie } from '@/lib/cookies'
 import { getCurrentSeason, getSeasonConfig, Season } from '@/lib/season'
 
 export function Providers({ children }: { children: React.ReactNode }) {
   const theme = useStore((state) => state.theme)
   const setTheme = useStore((state) => state.setTheme)
   const setUser = useStore((state) => state.setUser)
-  const user = useStore((state) => state.user)
 
   useEffect(() => {
     // Initialize theme
@@ -50,34 +49,12 @@ export function Providers({ children }: { children: React.ReactNode }) {
   }, [theme, setTheme])
 
   useEffect(() => {
-    // Restore user from localStorage first (faster)
-    if (!user && typeof window !== 'undefined') {
-      try {
-        const storage = localStorage.getItem('yt2-storage')
-        if (storage) {
-          const parsed = JSON.parse(storage)
-          if (parsed.state?.user) {
-            // User found in localStorage, restore it
-            setUser(parsed.state.user)
-            // Also set cookie for consistency
-            setCookie('yt2_session', parsed.state.user.id, 7)
-            return
-          }
-        }
-      } catch (e) {
-        console.error('Error reading user from localStorage:', e)
-      }
-    }
-
-    // Restore user from cookie if not in store
-    if (!user) {
-      const sessionId = getCookie('yt2_session')
-      if (sessionId) {
-        // Ensure DB is initialized
-        if (typeof window !== 'undefined') {
-          db.users.getAll() // This initializes the DB
-        }
-        const savedUser = db.users.findById(sessionId)
+    const sessionToken = getCookie('yt2_session')
+    if (sessionToken) {
+        db.users.getAll()
+        const session = db.sessions.findByToken(sessionToken)
+        const expired = session?.expiresAt && new Date(session.expiresAt).getTime() <= Date.now()
+        const savedUser = session && !expired ? db.users.findById(session.userId) : undefined
         if (savedUser) {
           // Check if user is blocked
           if (savedUser.isBlocked && savedUser.blockedUntil) {
@@ -90,7 +67,7 @@ export function Providers({ children }: { children: React.ReactNode }) {
             }
           }
           setUser(savedUser)
-          
+          db.sessions.update(session!.id, { lastActivity: new Date().toISOString() })
           // Award daily login currency
           if (typeof window !== 'undefined') {
             import('@/lib/currency-rewards').then(({ rewardDailyLogin }) => {
@@ -98,33 +75,11 @@ export function Providers({ children }: { children: React.ReactNode }) {
             })
           }
         } else {
-          // Cookie exists but user not found - clear cookie
-          if (typeof window !== 'undefined') {
-            document.cookie = 'yt2_session=;expires=Thu, 01 Jan 1970 00:00:00 UTC;path=/;'
-          }
+          deleteCookie('yt2_session')
+          setUser(null)
         }
-      }
-    } else if (user) {
-      // Sync user to cookie and localStorage
-      if (typeof window !== 'undefined') {
-        const sessionId = getCookie('yt2_session')
-        if (sessionId !== user.id) {
-          setCookie('yt2_session', user.id, 7)
-        }
-        // Also ensure user is in localStorage
-        try {
-          const storage = localStorage.getItem('yt2-storage')
-          if (storage) {
-            const parsed = JSON.parse(storage)
-            parsed.state.user = user
-            localStorage.setItem('yt2-storage', JSON.stringify(parsed))
-          }
-        } catch (e) {
-          // Ignore
-        }
-      }
-    }
-  }, [user, setUser])
+    } else setUser(null)
+  }, [setUser])
 
   return <>{children}</>
 }

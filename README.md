@@ -1,14 +1,18 @@
 
 <img width="4000" height="1094" alt="1" src="https://github.com/user-attachments/assets/dd1ac921-eeee-47c9-94c3-6e2987f14ea0" />
 
-# 🎬 YouTube - Современный видеохостинг
+# 🌊 YT 2.0 — wave.
 
-Полнофункциональная платформа для размещения и просмотра видео с современным дизайном, 3D эффектами и расширенными возможностями.
+Wave — это обновлённая версия YT 2.0: современный видеохостинг с единым Apple UI, glass surfaces, obsidian-палитрой и аккуратным UX.
 
-![Version](https://img.shields.io/badge/version-2.1.0-blue.svg)
+![Version](https://img.shields.io/badge/version-2.0.0--wave-green.svg)
 ![Next.js](https://img.shields.io/badge/Next.js-14-black)
 ![TypeScript](https://img.shields.io/badge/TypeScript-5.0-blue)
 ![License](https://img.shields.io/badge/license-MIT-green.svg)
+
+## ✨ Wave 2.0
+
+Проект полностью переименован и переработан под бренд **wave.**. В текущий релиз входят новый navbar и sidebar, обновлённые профили и каналы, redesigned video player, notifications, shop, studio, admin, auth-экраны и единый changelog.
 
 ## ✨ Основные возможности
 

@@ -1,12 +1,25 @@
 // Seed data for development/demo
 import { db } from './db'
+import { hashPassword } from './auth'
 
-export function seedDatabase() {
+function createBootstrapPassword(): string {
+  const source = typeof crypto !== 'undefined' && typeof crypto.randomUUID === 'function'
+    ? crypto.randomUUID().replace(/-/g, '')
+    : `${Date.now()}${Math.random().toString(36).slice(2)}`
+  return `Wave-${source.slice(0, 16)}!`
+}
+
+export function seedDatabase(): { adminPassword?: string; officialPassword?: string } {
+  let adminPassword: string | undefined
+  let officialPassword: string | undefined
   // Create official channel with correct login
-  const officialChannel = db.users.findByEmail('officialchannel@youtube.com') || db.users.create({
+  let officialChannel = db.users.findByEmail('officialchannel@youtube.com')
+  if (!officialChannel) {
+    officialPassword = createBootstrapPassword()
+    officialChannel = db.users.create({
     email: 'officialchannel@youtube.com',
     username: 'Official Channel',
-    password: 'officialchannel1', // Password from requirements
+    passwordHash: hashPassword(officialPassword),
     description: 'Официальный канал платформы YouTube',
     emailVerified: true,
     role: 'user',
@@ -14,34 +27,46 @@ export function seedDatabase() {
     avatarFrame: 'official-gold',
     nicknameHighlight: 'White Sparkles',
     badges: ['verified', 'staff'],
-  })
+    })
+  } else if (!officialChannel.passwordHash) {
+    officialPassword = createBootstrapPassword()
+    officialChannel = db.users.update(officialChannel.id, { passwordHash: hashPassword(officialPassword) }) || officialChannel
+  }
 
   // Create admin user with 'own' role
-  const admin = db.users.findByEmail('admin@yt2.com') || db.users.create({
+  let admin = db.users.findByEmail('admin@yt2.com')
+  if (!admin) {
+    adminPassword = createBootstrapPassword()
+    admin = db.users.create({
     email: 'admin@yt2.com',
     username: 'admin',
-    description: 'Главный администратор YouTube',
+    passwordHash: hashPassword(adminPassword),
+    description: 'Главный администратор wave. Пароль задаётся отдельным защищённым способом.',
     emailVerified: true,
     role: 'own',
-  })
+    })
+  } else if (!admin.passwordHash) {
+    adminPassword = createBootstrapPassword()
+    admin = db.users.update(admin.id, { passwordHash: hashPassword(adminPassword), role: 'own' }) || admin
+  }
 
   // Create sample users
-  const user1 = db.users.create({
-    email: 'demo@yt2.com',
-    username: 'DemoUser',
-    description: 'Демонстрационный канал с интересными видео',
-    emailVerified: true,
-  })
+  const user1 = db.users.findByEmail('demo@yt2.com') || db.users.create({
+      email: 'demo@yt2.com',
+      username: 'DemoUser',
+      description: 'Демонстрационный канал с интересными видео',
+      emailVerified: true,
+    })
 
-  const user2 = db.users.create({
-    email: 'creator@yt2.com',
-    username: 'TechCreator',
-    description: 'Канал о технологиях и программировании',
-    emailVerified: true,
-  })
+  const user2 = db.users.findByEmail('creator@yt2.com') || db.users.create({
+      email: 'creator@yt2.com',
+      username: 'TechCreator',
+      description: 'Канал о технологиях и программировании',
+      emailVerified: true,
+    })
 
   // Create sample videos
-  const video1 = db.videos.create({
+  const video1 = db.videos.getAll().find((video) => video.title === 'Введение в React и Next.js') || db.videos.create({
     title: 'Введение в React и Next.js',
     description: 'Узнайте основы React и Next.js в этом подробном руководстве. Мы рассмотрим компоненты, хуки, и серверный рендеринг.',
     videoUrl: 'https://commondatastorage.googleapis.com/gtv-videos-bucket/sample/BigBuckBunny.mp4',
@@ -53,7 +78,7 @@ export function seedDatabase() {
     userId: user2.id,
   })
 
-  const video2 = db.videos.create({
+  const video2 = db.videos.getAll().find((video) => video.title === 'Лучшие практики TypeScript') || db.videos.create({
     title: 'Лучшие практики TypeScript',
     description: 'Изучите передовые практики использования TypeScript в современных проектах.',
     videoUrl: 'https://commondatastorage.googleapis.com/gtv-videos-bucket/sample/ElephantsDream.mp4',
@@ -65,7 +90,7 @@ export function seedDatabase() {
     userId: user2.id,
   })
 
-  const video3 = db.videos.create({
+  const video3 = db.videos.getAll().find((video) => video.title === 'Музыка для работы и концентрации') || db.videos.create({
     title: 'Музыка для работы и концентрации',
     description: 'Спокойная фоновая музыка для продуктивной работы.',
     videoUrl: 'https://commondatastorage.googleapis.com/gtv-videos-bucket/sample/ForBiggerBlazes.mp4',
@@ -77,7 +102,7 @@ export function seedDatabase() {
     userId: user1.id,
   })
 
-  const video4 = db.videos.create({
+  const video4 = db.videos.getAll().find((video) => video.title === 'Обзор новейших игр 2024') || db.videos.create({
     title: 'Обзор новейших игр 2024',
     description: 'Подробный обзор самых ожидаемых игр этого года.',
     videoUrl: 'https://commondatastorage.googleapis.com/gtv-videos-bucket/sample/ForBiggerEscapes.mp4',
@@ -89,7 +114,7 @@ export function seedDatabase() {
     userId: user1.id,
   })
 
-  const video5 = db.videos.create({
+  const video5 = db.videos.getAll().find((video) => video.title === 'Путешествие по Японии') || db.videos.create({
     title: 'Путешествие по Японии',
     description: 'Красивые места и культура Японии в этом видео-путешествии.',
     videoUrl: 'https://commondatastorage.googleapis.com/gtv-videos-bucket/sample/ForBiggerFun.mp4',
@@ -114,5 +139,6 @@ export function seedDatabase() {
   video5.likes = 134
 
   console.log('Database seeded successfully!')
+  return { adminPassword, officialPassword }
 }
 

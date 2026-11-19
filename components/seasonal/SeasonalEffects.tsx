@@ -3,9 +3,10 @@
 import { useEffect, useState } from 'react'
 import { getCurrentSeason, getSeasonConfig } from '@/lib/season'
 import styles from './SeasonalEffects.module.scss'
+import { Season } from '@/lib/season'
 
 export function SeasonalEffects() {
-  const [currentSeason, setCurrentSeason] = useState<'spring' | 'summer' | 'autumn' | 'winter'>('spring')
+  const [currentSeason, setCurrentSeason] = useState<Season>(() => getCurrentSeason())
 
   useEffect(() => {
     const season = getCurrentSeason()
@@ -30,7 +31,7 @@ export function SeasonalEffects() {
       root.style.setProperty('--season-secondary', customConfig.colors.secondary)
       root.style.setProperty('--season-accent', customConfig.colors.accent)
       root.style.setProperty('--season-gradient', customConfig.colors.gradient)
-      setCurrentSeason(customSeason as any)
+    setCurrentSeason(customSeason as Season)
     } else {
       setCurrentSeason(season)
     }
@@ -46,9 +47,9 @@ export function SeasonalEffects() {
               key={i} 
               className={`${styles.leaf} leaf`}
               style={{
-                left: `${Math.random() * 100}%`,
-                animationDelay: `${Math.random() * 5}s`,
-                animationDuration: `${5 + Math.random() * 5}s`,
+                left: `${(i * 47) % 100}%`,
+                animationDelay: `${(i * 0.37) % 5}s`,
+                animationDuration: `${5 + ((i * 1.7) % 5)}s`,
               }}
             >🍂</div>
           ))}
@@ -62,9 +63,9 @@ export function SeasonalEffects() {
         <div className={styles.snow}>
           {Array.from({ length: 50 }).map((_, i) => (
             <div key={i} className={styles.snowflake} style={{
-              left: `${Math.random() * 100}%`,
-              animationDelay: `${Math.random() * 5}s`,
-              animationDuration: `${3 + Math.random() * 5}s`,
+              left: `${(i * 37) % 100}%`,
+              animationDelay: `${(i * 0.29) % 5}s`,
+              animationDuration: `${3 + ((i * 1.3) % 5)}s`,
             }}>❄</div>
           ))}
         </div>
@@ -76,18 +77,18 @@ export function SeasonalEffects() {
           <div className={styles.cherryBlossoms}>
             {Array.from({ length: 15 }).map((_, i) => (
               <div key={i} className={styles.petal} style={{
-                left: `${Math.random() * 100}%`,
-                animationDelay: `${Math.random() * 5}s`,
-                animationDuration: `${4 + Math.random() * 4}s`,
+                left: `${(i * 61) % 100}%`,
+                animationDelay: `${(i * 0.31) % 5}s`,
+                animationDuration: `${4 + ((i * 1.1) % 4)}s`,
               }}>🌸</div>
             ))}
           </div>
           <div className={styles.springPollen}>
             {Array.from({ length: 30 }).map((_, i) => (
               <div key={i} className={styles.pollen} style={{
-                left: `${Math.random() * 100}%`,
-                animationDelay: `${Math.random() * 5}s`,
-                animationDuration: `${6 + Math.random() * 4}s`,
+                left: `${(i * 23) % 100}%`,
+                animationDelay: `${(i * 0.23) % 5}s`,
+                animationDuration: `${6 + ((i * 0.9) % 4)}s`,
               }}></div>
             ))}
           </div>
@@ -101,9 +102,9 @@ export function SeasonalEffects() {
           <div className={styles.bubbles}>
             {Array.from({ length: 10 }).map((_, i) => (
               <div key={i} className={styles.bubble} style={{
-                left: `${Math.random() * 100}%`,
-                animationDelay: `${Math.random() * 5}s`,
-                animationDuration: `${4 + Math.random() * 4}s`,
+                left: `${(i * 53) % 100}%`,
+                animationDelay: `${(i * 0.41) % 5}s`,
+                animationDuration: `${4 + ((i * 1.2) % 4)}s`,
               }}></div>
             ))}
           </div>

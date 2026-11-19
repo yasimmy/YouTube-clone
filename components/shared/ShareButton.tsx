@@ -258,7 +258,7 @@ export function ShareButton({ url, title, type = 'video', timestamp }: ShareButt
               </div>
 
               <div className={styles.actions}>
-                {navigator.share && (
+                {typeof navigator !== 'undefined' && 'share' in navigator && (
                   <button className={styles.actionButton} onClick={handleShare}>
                     <FiShare2 />
                     Поделиться

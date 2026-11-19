@@ -6,6 +6,7 @@ import { Sidebar } from './Sidebar'
 import { SeasonalEffects } from '@/components/seasonal/SeasonalEffects'
 import { SeasonalCursorEffects } from '@/components/seasonal/SeasonalCursorEffects'
 import { CookieConsent } from './CookieConsent'
+import { useStore } from '@/lib/store'
 import styles from './Layout.module.scss'
 
 export function Layout({ children }: { children: React.ReactNode }) {
@@ -14,11 +15,13 @@ export function Layout({ children }: { children: React.ReactNode }) {
   const isNotFoundPage = pathname === '/404' || pathname === '/not-found'
   const isSeedPage = pathname === '/seed'
   const isAdminPage = pathname?.startsWith('/admin')
+  const sidebarOpen = useStore((state) => state.sidebarOpen)
 
   if (isAuthPage || isNotFoundPage || isSeedPage || isAdminPage) {
     return (
       <div className={styles.layout}>
         <Header />
+        <Sidebar />
         <main className={styles.mainFull}>{children}</main>
       </div>
     )
@@ -29,7 +32,7 @@ export function Layout({ children }: { children: React.ReactNode }) {
       <SeasonalEffects />
       <SeasonalCursorEffects />
       <Header />
-      <div className={styles.container}>
+      <div className={`${styles.container} ${sidebarOpen ? styles.sidebarOpen : styles.sidebarClosed}`}>
         <Sidebar />
         <main className={styles.main}>{children}</main>
       </div>

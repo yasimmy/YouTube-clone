@@ -9,12 +9,12 @@ import {
   FiVolumeX,
   FiVolume1,
   FiSettings,
-  FiMinimize2,
+  FiMinimize,
   FiMaximize2,
   FiChevronDown,
-  FiFilm,
-  FiSkipForward,
-  FiSkipBack,
+  FiCheck,
+  FiRotateCw,
+  FiRotateCcw,
 } from 'react-icons/fi'
 import styles from './CustomVideoPlayer.module.scss'
 
@@ -59,7 +59,6 @@ export function CustomVideoPlayer({
   const [isFullscreen, setIsFullscreen] = useState(false)
   const [isMiniPlayer, setIsMiniPlayer] = useState(false)
   const [theaterMode, setTheaterMode] = useState<TheaterMode>('normal')
-  const [autoplay, setAutoplay] = useState(false)
   
   // Меню и настройки
   const [showSettings, setShowSettings] = useState(false)
@@ -68,6 +67,7 @@ export function CustomVideoPlayer({
   const [quality, setQuality] = useState<Quality>('auto')
   const [showVolumeSlider, setShowVolumeSlider] = useState(false)
   const [isHoveringProgress, setIsHoveringProgress] = useState(false)
+  const [isDraggingProgress, setIsDraggingProgress] = useState(false)
   const [hoverTime, setHoverTime] = useState(0)
   
   const controlsTimeoutRef = useRef<NodeJS.Timeout>()
@@ -226,19 +226,46 @@ export function CustomVideoPlayer({
     }
   }, [onSeek, duration])
 
-  const handleSeek = (e: React.MouseEvent<HTMLDivElement>) => {
+  const updateProgress = (clientX: number) => {
     if (!progressRef.current) return
     const rect = progressRef.current.getBoundingClientRect()
-    const pos = (e.clientX - rect.left) / rect.width
+    const pos = Math.max(0, Math.min(1, (clientX - rect.left) / rect.width))
     const newTime = pos * duration
     setPlayed(pos)
     setPlayedSeconds(newTime)
     if (playerRef.current) {
       playerRef.current.seekTo(pos, 'fraction')
     }
+    onSeek?.(newTime)
   }
 
-  const handleProgressHover = (e: React.MouseEvent<HTMLDivElement>) => {
+  const handleSeek = (e: React.MouseEvent<HTMLDivElement>) => {
+    updateProgress(e.clientX)
+  }
+
+  const handleProgressPointerDown = (e: React.PointerEvent<HTMLDivElement>) => {
+    e.preventDefault()
+    setIsDraggingProgress(true)
+    e.currentTarget.setPointerCapture?.(e.pointerId)
+    updateProgress(e.clientX)
+  }
+
+  const handleProgressPointerMove = (e: React.PointerEvent<HTMLDivElement>) => {
+    if (isDraggingProgress) {
+      updateProgress(e.clientX)
+      return
+    }
+    handleProgressHover(e)
+  }
+
+  const handleProgressPointerUp = (e: React.PointerEvent<HTMLDivElement>) => {
+    if (!isDraggingProgress) return
+    updateProgress(e.clientX)
+    setIsDraggingProgress(false)
+    e.currentTarget.releasePointerCapture?.(e.pointerId)
+  }
+
+  const handleProgressHover = (e: React.MouseEvent<HTMLDivElement> | React.PointerEvent<HTMLDivElement>) => {
     if (!progressRef.current) return
     const rect = progressRef.current.getBoundingClientRect()
     const pos = (e.clientX - rect.left) / rect.width
@@ -341,9 +368,6 @@ export function CustomVideoPlayer({
           }}
           onEnded={() => {
             setPlaying(false)
-            if (autoplay && onNextVideo) {
-              onNextVideo()
-            }
           }}
           className={styles.reactPlayer}
           controls={false}
@@ -383,7 +407,10 @@ export function CustomVideoPlayer({
           ref={progressRef}
           className={styles.progressContainer}
           onClick={handleSeek}
-          onMouseMove={handleProgressHover}
+          onPointerDown={handleProgressPointerDown}
+          onPointerMove={handleProgressPointerMove}
+          onPointerUp={handleProgressPointerUp}
+          onPointerCancel={() => setIsDraggingProgress(false)}
           onMouseLeave={() => setIsHoveringProgress(false)}
         >
           <div className={styles.progressBar}>
@@ -431,7 +458,7 @@ export function CustomVideoPlayer({
               aria-label="Rewind 10s"
               title="Назад 10 сек"
             >
-              <FiSkipBack />
+              <FiRotateCcw />
             </button>
 
             <button
@@ -443,7 +470,7 @@ export function CustomVideoPlayer({
               aria-label="Forward 10s"
               title="Вперед 10 сек"
             >
-              <FiSkipForward />
+              <FiRotateCw />
             </button>
 
             <div
@@ -483,20 +510,6 @@ export function CustomVideoPlayer({
           </div>
 
           <div className={styles.controlsRight}>
-            <div className={styles.autoplayToggle}>
-              <button
-                className={`${styles.toggle} ${autoplay ? styles.active : ''}`}
-                onClick={(e) => {
-                  e.stopPropagation()
-                  setAutoplay(!autoplay)
-                }}
-                title={autoplay ? 'Автовоспроизведение включено' : 'Автовоспроизведение выключено'}
-              >
-                <span className={styles.toggleKnob} />
-              </button>
-              {autoplay && <span className={styles.autoplayLabel}>Авто</span>}
-            </div>
-
             <div className={styles.qualityMenu} ref={qualityRef}>
               <button
                 className={styles.controlBtn}
@@ -544,6 +557,7 @@ export function CustomVideoPlayer({
                         className={`${styles.settingsOption} ${playbackRate === rate ? styles.active : ''}`}
                         onClick={() => handlePlaybackRate(rate)}
                       >
+                        {playbackRate === rate && <FiCheck className={styles.optionCheck} />}
                         {rate}x
                       </button>
                     ))}
@@ -556,22 +570,11 @@ export function CustomVideoPlayer({
               className={styles.controlBtn}
               onClick={(e) => {
                 e.stopPropagation()
-                toggleTheaterMode()
-              }}
-              title="Режим театра"
-            >
-              <FiFilm />
-            </button>
-
-            <button
-              className={styles.controlBtn}
-              onClick={(e) => {
-                e.stopPropagation()
                 handleMiniPlayer()
               }}
               title="Мини-плеер"
             >
-              <FiMinimize2 />
+                <FiMinimize />
             </button>
 
             <button

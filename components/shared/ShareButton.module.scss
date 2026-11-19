@@ -371,3 +371,44 @@
   }
 }
 
+/* Compact Wave action used under videos and channels. */
+.shareButton > .button {
+  min-height: 34px;
+  padding: 0 12px;
+  color: #d6ded9;
+  background: rgba(255,255,255,.055);
+  border: 1px solid rgba(255,255,255,.11);
+  border-radius: 9px;
+  box-shadow: none;
+  font-size: 11px;
+  font-weight: 700;
+  transition: color 180ms ease, background 180ms ease, border-color 180ms ease, transform 180ms ease;
+}
+.shareButton > .button:hover { color: #07110d; background: #6ee7b7; border-color: #6ee7b7; transform: translateY(-1px); }
+.shareButton > .button svg { width: 15px; height: 15px; }
+
+/* Share dialog: centered, focused and consistent with Wave surfaces. */
+.shareButton .overlay { z-index: 1200; background: rgba(3,5,5,.72); backdrop-filter: blur(12px) saturate(90%); }
+.shareButton .menu { position: fixed; top: 50%; left: 50%; right: auto; z-index: 1201; width: min(430px, calc(100vw - 32px)); min-width: 0; max-height: min(720px, calc(100vh - 32px)); overflow: auto; background: rgba(15,18,17,.96); border: 1px solid rgba(255,255,255,.15); border-radius: 18px; box-shadow: 0 28px 90px rgba(0,0,0,.58), inset 0 1px 0 rgba(255,255,255,.06); transform: translate(-50%, -50%); animation: centeredMenuIn 220ms cubic-bezier(.16,1,.3,1) both; backdrop-filter: blur(22px) saturate(130%); }
+.shareButton .menuHeader { display: flex; align-items: center; justify-content: space-between; padding: 18px 19px; border-bottom: 1px solid rgba(255,255,255,.09); }
+.shareButton .menuHeader h3 { color: #f2f7f4; font-size: 16px; font-weight: 760; letter-spacing: -.025em; }
+.shareButton .menuContent { padding: 18px 19px 20px; }
+.shareButton .sectionLabel { margin-bottom: 8px; color: #8e9993; font-size: 9px; font-weight: 800; letter-spacing: .12em; }
+.shareButton .socialButtons { gap: 8px; margin-bottom: 18px; padding-bottom: 18px; border-bottom-color: rgba(255,255,255,.09); }
+.shareButton .socialButton { width: 42px; height: 42px; border: 1px solid rgba(255,255,255,.13); border-radius: 11px; color: #d8e0dc; background: rgba(255,255,255,.045); }
+.shareButton .socialButton svg { width: 19px; height: 19px; }
+.shareButton .socialButton:hover { color: #07110d; background: #6ee7b7; border-color: #6ee7b7; transform: translateY(-2px); box-shadow: 0 8px 22px rgba(110,231,183,.18); }
+.shareButton .urlSection { margin-bottom: 14px; }
+.shareButton .urlInputWrapper { gap: 7px; }
+.shareButton .urlInput, .shareButton .embedInput { min-height: 38px; padding: 9px 10px; color: #e8efeb; background: rgba(0,0,0,.24); border: 1px solid rgba(255,255,255,.11); border-radius: 9px; font-size: 11px; }
+.shareButton .copyButton { width: 38px; height: 38px; color: #cbd5d0; background: rgba(255,255,255,.055); border-color: rgba(255,255,255,.11); border-radius: 9px; }
+.shareButton .copyButton:hover { color: #07110d; background: #6ee7b7; border-color: #6ee7b7; }
+.shareButton .qrSection { margin-top: 17px; padding-top: 17px; border-top-color: rgba(255,255,255,.09); }
+.shareButton .qrSection .qrButton { min-height: 40px; margin: 0; padding: 0 14px; color: #e6efea; background: rgba(255,255,255,.045); border: 1px solid rgba(255,255,255,.14); border-radius: 9px; font-size: 11px; font-weight: 750; }
+.shareButton .qrSection .qrButton:hover { color: #07110d; background: #6ee7b7; border-color: #6ee7b7; }
+.shareButton .menuContent > .actions { display: flex; gap: 10px; margin-top: 10px; }
+.shareButton .menuContent > .actions .actionButton { min-height: 40px; padding: 0 14px; color: #07110d; background: #6ee7b7; border: 1px solid #6ee7b7; border-radius: 9px; font-size: 11px; font-weight: 800; }
+.shareButton .menuContent > .actions .actionButton:hover { background: #9af5ce; border-color: #9af5ce; transform: translateY(-1px); }
+.shareButton .menuContent > .actions .actionButton svg { width: 15px; height: 15px; }
+@keyframes centeredMenuIn { from { opacity: 0; transform: translate(-50%, calc(-50% + 12px)) scale(.96); } to { opacity: 1; transform: translate(-50%, -50%) scale(1); } }
+

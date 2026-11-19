@@ -169,8 +169,7 @@ export function HelpPage() {
                 {isOpen ? <FiChevronUp /> : <FiChevronDown />}
               </button>
 
-              {isOpen && (
-                <div className={styles.faqs}>
+              <div className={`${styles.faqs} ${isOpen ? styles.open : ''}`}>
                   {category.faqs.map((faq, index) => {
                     const faqId = `${category.id}-${index}`
                     const isFAQOpen = openFAQ === faqId
@@ -184,16 +183,13 @@ export function HelpPage() {
                           <span>{faq.question}</span>
                           {isFAQOpen ? <FiChevronUp /> : <FiChevronDown />}
                         </button>
-                        {isFAQOpen && (
-                          <div className={styles.faqAnswer}>
-                            <p>{faq.answer}</p>
-                          </div>
-                        )}
+                        <div className={`${styles.faqAnswer} ${isFAQOpen ? styles.open : ''}`}>
+                          <p>{faq.answer}</p>
+                        </div>
                       </div>
                     )
                   })}
-                </div>
-              )}
+              </div>
             </div>
           )
         })}

@@ -1,5 +1,6 @@
 export type AdminRole = 
   | 'own'      // Главный админ - все права
+  | 'admin'    // Совместимость со старой ролью администратора
   | 'admin1'   // Управление пользователями и каналами
   | 'admin2'   // Управление видео и контентом
   | 'admin3'   // Модерация жалоб
@@ -61,6 +62,9 @@ export interface User {
   subscribersCount: number
   createdAt: string
   emailVerified: boolean
+  password?: string
+  passwordHash?: string
+  updatedAt?: string
   role?: 'user' | AdminRole
   badges?: UserBadge[]
   avatarFrame?: AvatarFrame
@@ -153,7 +157,7 @@ export interface Like {
 export interface Notification {
   id: string
   userId: string
-  type: 'new_video' | 'video_deleted' | 'warning' | 'channel_blocked' | 'badge_earned' | 'season_changed' | 'new_feature' | 'subscription'
+  type: 'info' | 'new_video' | 'video_deleted' | 'warning' | 'channel_blocked' | 'badge_earned' | 'season_changed' | 'new_feature' | 'subscription'
   title: string
   message?: string
   link?: string
